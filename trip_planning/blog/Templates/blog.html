@@ -1,0 +1,62 @@
+{% extends 'base.html'%}
+{% load static %}
+{% block content %}
+    
+    <section class="hero-wrap hero-wrap-2" style="background-image: url({% static 'images/bg_1.jpeg' %})" data-stellar-background-ratio="0.5">
+      <div class="overlay"></div>
+      <div class="container">
+        <div class="row no-gutters slider-text js-fullheight align-items-center justify-content-center">
+          <div class="col-md-9 ftco-animate pb-0 text-center">
+          	<p class="breadcrumbs"><span class="mr-2"><a href="index.html">Home <i class="fa fa-chevron-right"></i></a></span> <span>Blog <i class="fa fa-chevron-right"></i></span></p>
+            <h1 class="mb-3 bread">Blogs</h1>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <section class="ftco-section">
+      <div class="container">
+        <div class="row d-flex">
+          {% for post in page_obj %}
+          <div class="col-md-3 d-flex ftco-animate">
+            <div class="blog-entry justify-content-end">
+              <div class="text">
+                <a href="{% url 'blog_detail' post.id %}" class="block-20 img" 
+                   style="background-image: url('{{ post.featured_image.url }}');">
+                </a>
+                <div class="meta mb-3">
+                  <div><a href="#">{{ post.published_date|date:"F d, Y" }}</a></div>
+                </div>
+                <h3 class="heading"><a href="{{ post.get_absolute_url }}">{{ post.title }}</a></h3>
+                <div><a href="#" class="meta-chat">{{ post.blog|truncatechars:50 }}</a></div>
+              </div>
+            </div>
+          </div>
+          {% endfor %}
+        </div>
+    
+        <div class="row mt-5">
+          <div class="col text-center">
+            <div class="block-27">
+              <ul>
+                {% if page_obj.has_previous %}
+                <li><a href="?page={{ page_obj.previous_page_number }}">&lt;</a></li>
+                {% endif %}
+    
+                {% for num in page_obj.paginator.page_range %}
+                <li class="{% if page_obj.number == num %}active{% endif %}">
+                  <a href="?page={{ num }}">{{ num }}</a>
+                </li>
+                {% endfor %}
+    
+                {% if page_obj.has_next %}
+                <li><a href="?page={{ page_obj.next_page_number }}">&gt;</a></li>
+                {% endif %}
+              </ul>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+    
+{% endblock %}

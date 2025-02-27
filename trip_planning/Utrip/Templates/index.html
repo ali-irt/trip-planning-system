@@ -1,0 +1,413 @@
+{% extends 'base.html' %}
+{% load static %}
+{% block content %}
+<style>
+	/* Floating Button */
+	.floating-chat-btn {
+	  position: fixed;
+	  bottom: 20px;
+	  right: 20px;
+	  background-color: #007bff;
+	  color: white;
+	  border: none;
+	  border-radius: 50%;
+	  width: 60px;
+	  height: 60px;
+	  box-shadow: 0px 4px 8px rgba(0, 0, 0, 0.2);
+	  cursor: pointer;
+	  z-index: 1000;
+	  font-size: 24px;
+	}
+  
+	/* Chat Interface */
+	#chat-interface-container {
+	  position: fixed;
+	  top: 0;
+	  left: 0;
+	  width: 100%;
+	  height: 100%;
+	  background-color: rgba(0, 0, 0, 0.5);
+	  display: flex;
+	  justify-content: center;
+	  align-items: center;
+	  z-index: 9999;
+	}
+  
+	#chat-interface-container.hidden {
+	  display: none;
+	}
+  
+	.chat-interface-header {
+	  background-color: #007bff;
+	  color: white;
+	  padding: 10px 20px;
+	  font-size: 18px;
+	  display: flex;
+	  justify-content: space-between;
+	  align-items: center;
+	  border-top-left-radius: 8px;
+	  border-top-right-radius: 8px;
+	}
+  
+	.chat-interface-content {
+	  background: white;
+	  width: 90%;
+	  max-width: 600px;
+	  height: 80%;
+	  border-radius: 8px;
+	  overflow: hidden;
+	  display: flex;
+	  flex-direction: column;
+	}
+  
+	.chat-interface-content iframe {
+	  flex-grow: 1;
+	  width: 100%;
+	  height: 100%;
+	}
+  </style>
+<section class="hero-wrap hero-wrap-2" style="background-image: url({% static 'images/bg_1.jpeg' %})" ; data-stellar-background-ratio="0.5">
+	<div class="overlay"></div>
+	
+<div class="container">
+		
+        <div class="row no-gutters slider-text align-items-center">
+          <div class="col-lg-7 col-md-6 ftco-animate d-flex align-items-end">
+          	<div class="text" style="margin-top: 60px;">
+	            <h1 class="mb-4">Find Perfect <br>Destination Of Your Choice.</h1>
+	            <p style="font-size: 18px;">From deserts to rivers, rivers to forests, and forests to mountains – let every journey tell a story</p>
+	            <p><a href="{% url 'destination_list' destination_spot='some-spot' %}" class="btn btn-primary py-3 px-4">View all Destinations</a></p>
+				
+            </div>
+          </div>
+        </div>
+      </div>
+
+		
+	  </section>
+	  
+    <section class="ftco-section ftco-no-pb ftco-no-pt bg-primary">
+      <div class="container">
+        <div class="row d-flex no-gutters">
+          <div class="col-md-3 d-flex align-items-stretch ftco-animate">
+            <div class="media block-6 services services-bg d-block text-center px-4 py-5">
+            	<div class="icon d-flex justify-content-center align-items-center"><span class="flaticon-business"></span></div>
+              <div class="media-body py-md-4">
+                <h3>Trusted by Thousands</h3>
+                <p>A small river named Duden flows by their place and supplies it with the necessary regelialia.</p>
+              </div>
+            </div>      
+          </div>
+          <div class="col-md-3 d-flex align-items-stretch ftco-animate">
+            <div class="media block-6 services services-bg services-darken d-block text-center px-4 py-5">
+            	<div class="icon d-flex justify-content-center align-items-center"><span class="flaticon-home"></span></div>
+              <div class="media-body py-md-4">
+                <h3>Wide Range of Destinations</h3>
+                <p>The world is a book, and those who do not travel read only one page.</p>
+              </div>
+            </div>      
+          </div>
+          <div class="col-md-3 d-flex align-items-stretch ftco-animate">
+            <div class="media block-6 services services-bg services-lighten d-block text-center px-4 py-5">
+            	<div class="icon d-flex justify-content-center align-items-center"><span class="flaticon-stats"></span></div>
+              <div class="media-body py-md-4">
+                <h3>Traveling Made Easy</h3>
+                <p>Travel far enough, you meet yourself.</p>
+              </div>
+            </div>      
+          </div>
+          <div class="col-md-3 d-flex align-items-stretch ftco-animate">
+            <div class="media block-6 services services-bg d-block text-center px-4 py-5">
+            	<div class="icon d-flex justify-content-center align-items-center"><span class="flaticon-quarantine"></span></div>
+              <div class="media-body py-md-4">
+                <h3>Locked in Scenery</h3>
+                <p>Take only memories, leave only footprints.</p>
+              </div>
+            </div>      
+          </div>
+        </div>
+      </div>
+    </section>
+
+	<section class="ftco-section ftco-no-pt">
+		<div class="container">
+		  <div class="row justify-content-center">
+			<div class="col-md-12 heading-section text-center ftco-animate mb-5">
+			  <span class="subheading">What you've got</span>
+			  <h2 class="mb-2">Featured Destinations</h2>
+			</div>
+		  </div>
+		  <div class="row">
+			<div class="container my-4  col-md-4 d-block">
+			
+						
+							  {% for destination in dests %}
+							  <a href="{% url 'destination_details' destination.destination_spot %}" >
+								  <div class="border" style="background-image: url('{{ destination.featured_img.url }}'); background-size: cover; background-position: center;">
+									  <div class="desc">
+										  <strong class="d-inline-block mb-2 text-primary">CITY: {{ destination.city }}</strong>
+										  <h4 class="mb-0">{{ destination.destination_spot }}</h4>
+										  <p class="mt-2">Type: {{ destination.category }}</p>
+										  <div class="mt-auto">
+											  <span class="btn btn-primary btn-sm">Explore more</span>
+										  </div>
+									  </div>
+								  </div>
+							  </a>
+							  {% endfor %}
+						  </div>
+					  </div>
+					 
+		
+		
+		  
+		</div>
+	  </section>
+	  
+             
+
+
+    <section class="ftco-section ftco-no-pb ftco-no-pt">
+			<div class="container">
+				<div class="row">
+					<div class="col-md-7 order-md-last d-flex align-items-stretch">
+						<div class="img w-100 img-2 mr-md-2" style="background-image:  url({% static 'images/logo.png' %})"></div>
+					</div>
+					<div class="col-md-5 wrap-about py-md-5 ftco-animate">
+	          <div class="heading-section pr-md-5">
+	            <h2 class="mb-4">WanderWise Traveling</h2>
+
+	            <p>	WanderWise, a visionary travel company, revolutionized how people explore the world. By seamlessly blending technology with personalized experiences,<br>
+					 WanderWise offered curated travel plans tailored to every wanderer’s dreams.<br>
+					 Their user-friendly platform simplified trip planning, while partnerships with global destinations ensured exclusive deals.<br>
+					 In just two years, WanderWise grew its customer base by 300%, with 95% customer satisfaction rates.<br>
+					 Travelers praised the company for creating unforgettable memories, from serene beach getaways to thrilling adventures. By focusing on sustainability and community engagement,<br>
+					 WanderWise not only expanded horizons but also left a positive impact worldwide, becoming the go-to choice for modern explorers.</p></div>
+			</div>
+				</div>
+			</div>
+		</section>
+
+		<section class="ftco-counter img" id="section-counter">
+    	<div class="container">
+    		<div class="row pt-md-5">
+          <div class="col-md-6 col-lg-3 justify-content-center counter-wrap ftco-animate">
+            <div class="block-18 py-5 mb-4">
+				<div class="text text-border d-flex align-items-center">
+					<strong class="number" data-number="100">100<span style="font-size: 0.5em; vertical-align: super;">+</span></strong>
+					<span>Total <br>Employees</span>
+				</div>
+            </div>
+          </div>
+          <div class="col-md-6 col-lg-3 justify-content-center counter-wrap ftco-animate">
+            <div class="block-18 py-5 mb-4">
+              <div class="text text-border d-flex align-items-center">
+                <strong class="number" data-number="25000">+</strong>
+                <span>Total <br>Trips</span>
+              </div>
+            </div>
+          </div>
+         
+          <div class="col-md-6 col-lg-3 justify-content-center counter-wrap ftco-animate">
+            <div class="block-18 py-5 mb-4">
+              <div class="text d-flex align-items-center">
+                <strong class="number" data-number="10">0</strong>
+                <span>Total <br>Offices</span>
+              </div>
+            </div>
+          </div>
+        </div>
+    	</div>
+    </section>
+
+    <section class="ftco-section testimony-section bg-light">
+      <div class="container">
+        <div class="row justify-content-center mb-5">
+          <div class="col-md-7 text-center heading-section ftco-animate">
+          	<span class="subheading">Testimonial</span>
+            <h2 class="mb-3">Happy Clients</h2>
+          </div>
+        </div>
+        <div class="row ftco-animate">
+          <div class="col-md-12">
+            <div class="carousel-testimony owl-carousel">
+              <div class="item">
+                <div class="testimony-wrap py-4">
+                  <div class="text">
+                  	<span class="fa fa-quote-left"></span>
+                    <p class="mb-4">Very good services.100% recommended</p>
+                    <div class="d-flex align-items-center">
+                    	<div class="user-img" style="background-image: url({% static 'images/p1.jpg' %})"></div>
+                    	<div class="pl-3">
+		                    <p class="name">irtaza khalid</p>
+		                    <span class="position">Sales Manager</span>
+		                  </div>
+	                  </div>
+                  </div>
+                </div>
+              </div>
+              <div class="item">
+                <div class="testimony-wrap py-4">
+                  <div class="text">
+                  	<span class="fa fa-quote-left"></span>
+                    <p class="mb-4">Futureistic services.</p>
+                    <div class="d-flex align-items-center">
+                    	<div class="user-img" style="background-image: url({% static 'images/p2.jpg' %})"></div>
+                    	<div class="pl-3">
+		                    <p class="name">ali irtaza</p>
+		                    <span class="position">COO techlivi</span>
+		                  </div>
+	                  </div>
+                  </div>
+                </div>
+              </div>
+              <div class="item">
+                <div class="testimony-wrap py-4">
+                  <div class="text">
+                  	<span class="fa fa-quote-left"></span>
+                    <p class="mb-4">amazing.</p>
+                    <div class="d-flex align-items-center">
+                    	<div class="user-img" style="background-image: url({% static 'images/p3.jpg' %})"></div>
+                    	<div class="pl-3">
+		                    <p class="name">ali khalid</p>
+		                    <span class="position">CEO ak group</span>
+		                  </div>
+	                  </div>
+                  </div>
+                </div>
+              </div>
+              <div class="item">
+                <div class="testimony-wrap py-4">
+                  <div class="text">
+                  	<span class="fa fa-quote-left"></span>
+                    <p class="mb-4"> should focus internationally</p>
+                    <div class="d-flex align-items-center">
+                    	<div class="user-img" style="background-image: url({% static 'images/p4.jpg' %})"></div>
+                    	<div class="pl-3">
+		                    <p class="name">Roger Scott</p>
+		                    <span class="position">Director strategy</span>
+		                  </div>
+	                  </div>
+                  </div>
+                </div>
+              </div>
+              <div class="item">
+                <div class="testimony-wrap py-4">
+                  <div class="text">
+                  	<span class="fa fa-quote-left"></span>
+                    <p class="mb-4">Excited for colab with WanderWise.</p>
+                    <div class="d-flex align-items-center">
+                    	<div class="user-img" style="background-image: url({% static 'images/person_5.jpg' %})"></div>
+                    	<div class="pl-3">
+		                    <p class="name">ali irtaza khalid</p>
+		                    <span class="position">sr. software engineer</span>
+		                  </div>
+	                  </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <section class="ftco-section ftco-agent">
+    	<div class="container">
+    		<div class="row justify-content-center pb-5">
+          <div class="col-md-12 heading-section text-center ftco-animate">
+            <h2 class="mb-4">Leaderboard</h2>
+          </div>
+        </div>
+        <div class="row">
+        	<div class="col-md-3 ftco-animate">
+        		<div class="agent">
+    					<div class="img">
+		    				<img src="{% static 'images/team-1.jpeg'%}" class="img-fluid" >
+		    				<div class="desc">
+		    					<h3><a href="{% url 'about'%}">Ali Irtaza</a></h3>
+									<p class="h-info"><span class="location">Founder & CEO </span> <span class="details">WanderWise</span></p>
+		    				</div>
+	    				</div>
+    				</div>
+        	</div>
+        	<div class="col-md-3 ftco-animate">
+        		<div class="agent">
+    					<div class="img">
+		    				<img src="{% static 'images/team-2.jpg'%}" class="img-fluid" >
+	    				</div>
+	    				<div class="desc">
+	    					<h3><a href="{% url 'about'%}">Mike Bochs</a></h3>
+								<p class="h-info"><span class="location">Co-Founder & CFO</span> <span class="details">WanderWise</span></p>
+	    				</div>
+    				</div>
+        	</div>
+        	<div class="col-md-3 ftco-animate">
+        		<div class="agent">
+    					<div class="img">
+		    				<img src="{% static 'images/team-3.jpg'%}" class="img-fluid" alt="Colorlib Template">
+	    				</div>
+	    				<div class="desc">
+	    					<h3><a href="{% url 'about'%}">Jessica Moore</a></h3>
+								<p class="h-info"><span class="location">COO</span> <span class="details">WanderWise</span></p>
+	    				</div>
+    				</div>
+        	</div>
+        	<div class="col-md-3 ftco-animate">
+        		<div class="agent">
+    					<div class="img">
+		    				<img src="{% static 'images/team-4.jpg'%}" class="img-fluid" alt="Colorlib Template">
+	    				</div>
+	    				<div class="desc">
+	    					<h3><a href="{% url 'about'%}">Sarah Geronimo</a></h3>
+								<p class="h-info"><span class="position">CSO</span> <span class="details">WanderWise</span></p>
+	    				</div>
+    				</div>
+        	</div>
+        </div>
+    	</div>
+
+    </section>
+	<button class="floating-chat-btn" onclick="toggleChatInterface()">💬</button>
+
+	<!-- Chat Interface Container -->
+	<div id="chat-interface-container" class="hidden">
+	  <div class="chat-interface-header">
+		<span>Travel Assistant</span>
+		<button onclick="toggleChatInterface()">✖</button>
+	  </div>
+	  <div class="chat-interface-content">
+		<iframe 
+		  src="https://cdn.botpress.cloud/webchat/v2.2/shareable.html?configUrl=https://files.bpcontent.cloud/2025/01/24/13/20250124134851-V8FVY11P.json"
+		  frameborder="0"></iframe>
+	  </div>
+	</div>
+	
+	
+	
+	<script>
+	  // Toggle the visibility of the chat interface
+	  function toggleChatInterface() {
+		const chatContainer = document.getElementById('chat-interface-container');
+		chatContainer.classList.toggle('hidden');
+	  }
+	</script>
+
+  
+<link rel="icon" href="{% static 'scss/favicon.ico' %}" type="image/x-icon">
+<script src="{% static 'js/jquery.min.js' %}"></script>
+<script src="{% static 'js/jquery-migrate-3.0.1.min.js' %}"></script>
+<script src="{% static 'js/popper.min.js' %}"></script>
+<script src="{% static 'js/bootstrap.min.js' %}"></script>
+<script src="{% static 'js/jquery.easing.1.3.js' %}"></script>
+<script src="{% static 'js/jquery.waypoints.min.js' %}"></script>
+<script src="{% static 'js/jquery.stellar.min.js' %}"></script>
+<script src="{% static 'js/owl.carousel.min.js' %}"></script>
+<script src="{% static 'js/jquery.magnific-popup.min.js' %}"></script>
+<script src="{% static 'js/jquery.animateNumber.min.js' %}"></script>
+<script src="{% static 'js/scrollax.min.js' %}"></script>
+<script src="https://maps.googleapis.com/maps/api/js?key=AIzaSyBVWaKrjvy3MaE7SQ74_uJiULgl1JY0H2s&sensor=false"></script>
+<script src="{% static 'js/google-map.js' %}"></script>
+<script src="{% static 'js/main.js' %}"></script>
+
+{% endblock  %}

@@ -1,0 +1,166 @@
+{% extends 'base.html' %}
+{% load static %}
+{% load socialaccount %}
+{% block content %}
+
+
+<head>
+    <title>Login here</title>
+    <meta charset="UTF-8">
+
+    <!-- Internal CSS -->
+    <style>
+        body {
+            font-family: 'Nunito Sans', sans-serif;
+            margin: 0;
+            padding: 0;
+
+        }
+
+        .limiter {
+            width: 100%;
+            margin: 0 auto;
+        }
+
+        .container-login100 {
+            width: 100%;
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            background-size: cover;
+            background-position: center;
+        }
+
+        .wrap-login100 {
+            width: 400px;
+            background: #fff;
+            border-radius: 10px;
+            overflow: hidden;
+            padding: 30px 25px;
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.2);
+        }
+
+        .login100-form-title {
+            font-size: 24px;
+            font-weight: bold;
+            color: #333;
+            text-align: center;
+            margin-bottom: 20px;
+        }
+
+        .wrap-input100 {
+            position: relative;
+            width: 100%;
+            margin-bottom: 20px;
+        }
+
+        .label-input100 {
+            display: block;
+            font-size: 14px;
+            color: #333;
+            margin-bottom: 8px;
+        }
+
+        .input100 {
+            width: 100%;
+            padding: 10px;
+            font-size: 14px;
+            border: 1px solid #ddd;
+            border-radius: 5px;
+        }
+
+        .input100:focus {
+            border-color: #007bff;
+            outline: none;
+        }
+
+        .container-login100-form-btn {
+            margin-top: 20px;
+            text-align: center;
+        }
+
+        .login100-form-btn {
+            width: 100%;
+            padding: 10px;
+            font-size: 16px;
+            color: #fff;
+            background: #007bff;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+        }
+
+        .login100-form-btn:hover {
+            background: #0056b3;
+        }
+
+        .txt6, .txt2 {
+            display: inline-block;
+            margin-top: 15px;
+            font-size: 14px;
+            color: #007bff;
+            text-decoration: none;
+        }
+
+        .txt6:hover, .txt2:hover {
+            text-decoration: underline;
+        }
+
+        .flex-col-c {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            margin-top: 20px;
+        }
+    </style>
+</head>
+
+<section class="hero-wrap" style="background-image: url({% static 'images/place-1.jpg' %})">
+ 
+  
+    <form action="{% url 'login' %}" method="POST">
+        {% csrf_token %}
+        <div class="limiter">
+            <div class="container-login100" >
+                <div class="wrap-login100 p-l-55 p-r-55 p-t-65 p-b-54">
+                    <span class="login100-form-title p-b-49">Login</span>
+
+                    <div class="wrap-input100 validate-input m-b-23" data-validate="Username is required">
+                        <span class="label-input100">Username</span>
+                        <input class="input100" type="text" name="username" placeholder="Type your username" minlength="10" maxlength="50" required>
+                    </div>
+
+                    <div class="wrap-input100 validate-input" data-validate="Password is required">
+                        <span class="label-input100">Password</span>
+                        <input class="input100" type="password" name="password" placeholder="Type your password" minlength="4" maxlength="10" required>
+                    </div>
+
+                    <div class="container-login100-form-btn">
+                        <button class="login100-form-btn">Login</button>
+                    </div>
+
+                    <a href="{% provider_login_url 'google' %}" class="btn btn-outline-danger d-flex align-items-center justify-content-center" style="gap: 10px;">
+                        <img src="https://upload.wikimedia.org/wikipedia/commons/thumb/5/53/Google_%22G%22_Logo.svg/512px-Google_%22G%22_Logo.svg.png" 
+                             alt="Google Logo" 
+                             style="width: 20px; height: 20px;">
+                        Login with Google
+                    </a>
+                    
+                    <div>
+                        {% for message in messages %}
+                        <h4>{{ message }}</h4>
+                        {% endfor %}
+                    </div>
+
+                    <div class="flex-col-c p-t-80">
+                        <a href="{% url 'register' %}" class="txt6">Sign Up</a><br>
+                        <a href="{% url 'about' %}" class="txt2">About Us</a>
+                        <a href="{% url 'contact' %}" class="txt2">Contact Us</a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </form>
+</section>
+{% endblock %}

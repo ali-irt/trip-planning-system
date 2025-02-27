@@ -1,0 +1,145 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block content %}
+
+<!-- Hero Section with Parallax and Overlay -->
+<section class="hero-wrap hero-wrap-2" style="background-image: url({% static 'images/bg_1.jpeg' %});" data-stellar-background-ratio="0.5">
+    <div class="overlay"></div>
+    <div class="container">
+        <div class="row no-gutters slider-text align-items-center">
+            <div class="col-lg-7 col-md-6 ftco-animate d-flex align-items-end">
+                <div class="text" style="margin-top: 60px;">
+                    <h1 class="mb-4 display-4 text-white font-weight-bold animated fadeInUp">Find the Perfect <br>Destination of Your Choice</h1>
+                    <p class="lead text-white animated fadeInUp" style="animation-delay: 0.5s;">From deserts to rivers, rivers to forests, and forests to mountains – let every journey tell a story.</p>
+                    <p><a href="{% url 'destination_list' destination_spot='some-spot' %}" class="btn btn-primary py-3 px-4 rounded-pill animated fadeInUp" style="animation-delay: 1s;">View all Destinations</a></p>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- Destination Header with Text Shadow -->
+<div class="destination_banner_wrap overlay py-5 bg-dark">
+    <div class="destination_text text-center text-white">
+        <h2 class="display-4 font-weight-bold text-shadow">{{ destination.destination_spot }}</h2>
+        <h3 class="font-italic">{{ destination.city }}</h3>
+    </div>
+</div>
+
+<!-- Destination Details with Modern Layout -->
+<div class="destination_details_info py-5 bg-light">
+    <div class="container">
+        <div class="row justify-content-center">
+            <div class="col-lg-8 col-md-9">
+                <div class="destination_info">
+                    <h3 class="mb-4 font-weight-bold">Environment</h3>
+                    <p>{{ destination.category }}</p>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+<!-- Destination Details with Modern Layout -->
+<div class="destination_details_info py-5 bg-light">
+    <div class="container">
+        <div class="row justify-content-center">
+            <div class="col-lg-8 col-md-9">
+                <div class="destination_info">
+                    <h3 class="mb-4 font-weight-bold">Description</h3>
+                    <p>{{ destination.description }}</p>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Fancy Hotel Listings with Cards -->
+<div class="accommodation py-5">
+    <div class="container">
+        <h3 class="text-center mb-5 font-weight-bold">Check into </h3>
+     <div>   <a href="{% url 'hotels' %}" class="btn btn-primary py-3 px-4 rounded-pill animated fadeInUp" style="animation-delay: 1s;">View all Hotels</a>
+     </div>
+        {% if accommodations %}
+        <div class="row">
+            {% for hotel in accommodations %}
+            <div class="col-md-4 mb-4">
+                <div class="card shadow-lg rounded">
+                    <div class="destination-box border p-3" style="background-image: url('{{ destination.img1.url }}'); background-size: cover; background-position: center;">
+                        <div class="card-body">
+                        <h5 class="card-title">{{ hotel.name }}</h5>
+                        <p class="card-text">Price: {{ hotel.average_price }} | Rooms: {{ hotel.rooms }}</p>
+                        <a href="{% url 'hotel_details' hotel.id %}" class="btn btn-primary rounded-pill">Book Now</a>
+                    </div>
+                </div>
+                </div>
+            </div>
+            {% endfor %}
+        </div>
+        {% else %}
+        <p>No accommodations found for this destination.</p>
+        {% endif %}
+    </div>
+</div>
+
+<!-- Reviews Carousel with Smooth Transitions -->
+<div class="container mt-5">
+    <h3 class="text-center mb-4 font-weight-bold">Traveler Reviews</h3>
+    <div id="reviewCarousel" class="carousel slide" data-ride="carousel">
+        <!-- Carousel Indicators -->
+        <ul class="carousel-indicators">
+            {% for i in reviews %}
+            <li data-target="#reviewCarousel" data-slide-to="{{ forloop.counter0 }}" class="{% if forloop.first %}active{% endif %}"></li>
+            {% endfor %}
+        </ul>
+
+        <!-- Carousel Items -->
+        <div class="carousel-inner">
+            {% for i in reviews %}
+            <div class="carousel-item {% if forloop.first %}active{% endif %}">
+                <div class="row">
+                    {% for review in reviews|slice:"{{ forloop.counter0|add:'-1' }}:{{ forloop.counter0|add:'3' }}" %}
+                    <div class="col-md-3 mb-4">
+                        <div class="card text-center shadow-sm">
+                            <div class="card-body">
+                                <h5 class="card-title text-uppercase">{{ review.user.username }}</h5>
+                                <p class="card-text text-muted">{{ review.review }}</p>
+                            </div>
+                        </div>
+                    </div>
+                    {% endfor %}
+                </div>
+            </div>
+            {% endfor %}
+        </div>
+
+        <!-- Carousel Controls -->
+        <a class="carousel-control-prev" href="#reviewCarousel" role="button" data-slide="prev">
+            <span class="carousel-control-prev-icon" aria-hidden="true"></span>
+            <span class="sr-only">Previous</span>
+        </a>
+        <a class="carousel-control-next" href="#reviewCarousel" role="button" data-slide="next">
+            <span class="carousel-control-next-icon" aria-hidden="true"></span>
+            <span class="sr-only">Next</span>
+        </a>
+    </div>
+</div>
+
+<!-- Review Form with Custom Style -->
+<div class="container mt-5 mb-5">
+    <h5 class="font-weight-bold">Write Your Review</h5>
+    <form action="" method="POST" class="form">
+        {% csrf_token %}
+        <div class="form-group">
+            {{ form.as_p }}
+        </div>
+
+        {% if user.is_authenticated %}
+        <button type="submit" class="btn btn-primary rounded-pill btn-lg">Submit Review</button>
+        {% else %}
+        <p class="text-danger mt-2">You need to be logged in to leave a review.</p>
+        {% endif %}
+    </form>
+</div>
+
+{% endblock %}

@@ -1,0 +1,70 @@
+{% extends 'base.html' %}
+
+{% block content %}
+<!-- Empty hero section for spacing -->
+<section class="hero-wrap-3" style="background-color: #4C585B ; data-stellar-background-ratio="0.5"></section>
+
+<div class="faq-container">
+    <h2>Frequently Asked Questions</h2>
+    
+    {% for faq in faq %}
+    <div class="faq-item">
+        <div class="faq-question" onclick="toggleAnswer('answer{{ forloop.counter }}')">
+            {{ faq.question }}
+        </div>
+        <div class="faq-answer" id="answer{{ forloop.counter }}">
+            {{ faq.answer }}
+        </div>
+    </div>
+    {% endfor %}
+</div>
+
+<style>
+    .hero-wrap-3 {
+        height: 120px;  /* Ensures space is retained */
+    }
+    .faq-container {
+        max-width: 800px;
+        margin: auto;
+        background: white;
+        padding: 20px;
+        border-radius: 8px;
+        box-shadow: 0px 0px 10px rgba(0, 0, 0, 0.1);
+    }
+    h2 {
+        text-align: center;
+        color: #333;
+    }
+    .faq-item {
+        margin-bottom: 20px;
+        padding: 10px;
+        border-bottom: 1px solid #ddd;
+    }
+    .faq-question {
+        font-weight: bold;
+        color: #0056b3;
+        cursor: pointer;
+    }
+    .faq-answer {
+        display: none;
+        margin-top: 5px;
+        color: #555;
+    }
+</style>
+
+<script>
+    function toggleAnswer(id) {
+        var answer = document.getElementById(id);
+
+        if (answer.style.display === "none") {
+            answer.classList.toggle("open");
+
+            answer.style.display = "block";
+        } else {
+            answer.style.display = "none";
+        }
+    }
+
+</script>
+
+{% endblock %}

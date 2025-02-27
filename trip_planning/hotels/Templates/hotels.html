@@ -1,0 +1,55 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block content %}
+<section class="hero-wrap hero-wrap-2" 
+         style="background-image: url({% static 'images/bg_1.jpeg' %});" 
+         data-stellar-background-ratio="0.5">
+    <div class="overlay"></div>
+    <div class="container">
+        <div class="row no-gutters slider-text js-fullheight align-items-center justify-content-center">
+            <div class="col-md-9 ftco-animate pb-0 text-center">
+                <p class="breadcrumbs">
+                    <span class="mr-2">
+                        <a href="{% url 'index' %}">Home <i class="fa fa-chevron-right"></i></a>
+                    </span>
+                    <span>Contact <i class="fa fa-chevron-right"></i></span>
+                </p>
+                <h1 class="mb-3 bread">Become Our Partner</h1>
+            </div>
+        </div>
+    </div>
+</section>
+
+<section class="ftco-section contact-section">
+    <div class="container">
+        <div class="row justify-content-center">
+            <div class="col-md-8 mb-md-5">
+                <div class="card shadow-lg p-4">
+                    <h2 class="text-center mb-4">Register your Hotel</h2>
+                    <form method="POST" class="bg-light p-4 rounded">
+                        {% csrf_token %}
+                        <div class="form-group">
+                            {{ form.as_p }}
+                        </div>
+                        <div class="text-center">
+                            <button type="submit" class="btn btn-primary px-4 py-2">Submit</button>
+                            <a href="{% url 'trans' %}" class="btn btn-primary px-4 py-2">Register your vehicle </a>
+
+                        </div>
+                    </form>
+
+                    {% if messages %}
+                    <div class="mt-3">
+                        {% for message in messages %}
+                            <div class="alert alert-{{ message.tags }}">{{ message }}</div>
+
+                        {% endfor %}
+                    </div>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+{% endblock %}
