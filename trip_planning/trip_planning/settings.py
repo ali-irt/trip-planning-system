@@ -18,7 +18,7 @@ SECRET_KEY = 'django-insecure-*!3qfub#tpbpamgmu3a2@_i*d#5cj+t8#x89gcnp(rjls%g!=x
 
 DEBUG = False
 
-ALLOWED_HOSTS = ['*']
+ALLOWED_HOSTS = ['https://wanderwise-m7t3.onrender.com']
 
 INSTALLED_APPS = [
     'django.contrib.admin',
