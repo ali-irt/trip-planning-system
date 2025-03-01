@@ -120,8 +120,16 @@ USE_TZ = True
 
 # Corrected STATIC_URL with a trailing slash
 # settings.py
+
 STATIC_URL = '/static/'
 
+# Add this line
+STATIC_ROOT = os.path.join(BASE_DIR, 'staticfiles')
+
+# Ensure STATICFILES_DIRS is defined correctly
+STATICFILES_DIRS = [
+    os.path.join(BASE_DIR, 'static'),  # Only if you have a 'static' folder
+]
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 # to receive messages from user
 # as we are still working locally so no need for SMTP setup we will review this later
