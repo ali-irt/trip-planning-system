@@ -3,6 +3,10 @@ from django.contrib.auth.models import User
 from django.db.models import Avg, Count
 from django.core.validators import MinValueValidator
 import random
+from django.db.models.signals import post_save
+from django.dispatch import receiver
+# Create your models here.
+
 
 class City(models.Model):
     PAKISTAN_PROVINCES = [
@@ -29,9 +33,9 @@ class Destination(models.Model):
     destination_spot = models.CharField(max_length=100, null=True)
     keywords = models.CharField(max_length=250)
     category = models.ForeignKey(Category,on_delete=models.CASCADE)
-    featured_img = models.ImageField(upload_to='pics')
-    img1 = models.ImageField(upload_to='pics')
-    img2 = models.ImageField(upload_to='pics')
+    featured_img = models.ImageField(upload_to='pictures/pics')
+    img1 = models.ImageField(upload_to='pictures/pics')
+    img2 = models.ImageField(upload_to='pictures/pics')
     description = models.TextField()
     def __str__(self):
         return self.destination_spot
@@ -82,12 +86,94 @@ class OTP(models.Model):
         return f"{self.user.username} - {self.otp}"
 
 class Profile(models.Model):
-    username = models.OneToOneField(User, on_delete=models.CASCADE, related_name='profile')
+    user = models.OneToOneField(User, on_delete=models.CASCADE, related_name='profile')
     city = models.CharField(max_length=100, blank=True, null=True)
-    phone = models.CharField(max_length=15, blank=True, null=True)  # Allow more digits for international formats
-    email = models.CharField(max_length=15, blank=True, null=True)  
-    profile_picture = models.ImageField(upload_to='profile_pictures/', default='profile_pictures/default.jpg', blank=True)
+    phone = models.CharField(max_length=15, blank=True, null=True)  # International formats
+    email = models.EmailField(max_length=254)
+    profile_picture = models.ImageField(upload_to='pictures/profile_pictures/', default='profile_pictures/default.jpg', blank=True)
     date_joined = models.DateTimeField(auto_now_add=True)
 
     def __str__(self):
         return self.user.username
+    
+
+
+@receiver(post_save, sender=User)
+def create_or_update_user_profile(sender, instance, created, **kwargs):
+    if created:
+        Profile.objects.create(user=instance)
+    instance.profile.save()
+
+
+
+STATUS_CHOICES = [
+    ('pending', 'Pending'),
+    ('accepted', 'Accepted'),
+    ('declined', 'Declined'),
+    ('completed', 'Completed'),
+]
+
+class TripProposal(models.Model):
+
+    proposer = models.ForeignKey(User, on_delete=models.CASCADE, related_name='proposals')
+    destination = models.ManyToManyField(Destination, related_name='trip_proposals')
+    date = models.DateField()
+    invitees = models.ManyToManyField(User, related_name='trip_invites')  # Invitees
+    status = models.CharField(max_length=20, choices=STATUS_CHOICES, default="pending")
+
+    def __str__(self):
+        return f"Trip by {self.proposer} on {self.date}"
+
+
+
+class Type(models.Model):
+    id = models.AutoField(primary_key=True)
+    type = models.CharField(max_length=50)
+    def __str__(self):
+        return self.type
+
+
+
+class Accommodation(models.Model):
+    owner = models.CharField(max_length=50)
+    name = models.CharField(max_length=50)
+    destination = models.ForeignKey('City', on_delete=models.CASCADE)
+    type = models.ForeignKey('Type', on_delete=models.CASCADE)
+    average_price = models.DecimalField(max_digits=10, decimal_places=2)
+    rooms = models.IntegerField(default=1, validators=[MinValueValidator(1)])
+    contact = models.CharField(max_length=20)
+    img1 = models.ImageField(upload_to='pictures/pics_rooms/', blank=True, null=True)
+    img2 = models.ImageField(upload_to='pictures/pics_rooms/', blank=True, null=True)
+    address = models.TextField()
+    business_license = models.FileField(upload_to='documents/business_licenses/')
+    registration_certificate = models.FileField(upload_to='documents/registration_certificates/')
+    is_approved = models.BooleanField(default=False)
+    created_at = models.DateTimeField(auto_now_add=True)
+
+    def __str__(self):
+        return str(self.name) if self.name else "Unnamed"
+
+
+
+class Transportation(models.Model):
+    Vtype=[
+        ('sedan', 'Sedan'),
+        ('suv', 'SUV'),
+        ('offroader', 'Offroader'),
+        ('hatchback', 'Hatchback'),
+        ('crossover', 'Crossover'),
+        ('hybrid', 'Hybrid'),
+    ]
+    origin = models.ForeignKey(City, on_delete=models.CASCADE)
+    type = models.CharField(max_length=50,choices=Vtype,default='sedan')
+    registeration_number = models.CharField(max_length=20)
+    average_rent = models.DecimalField(max_digits=10, decimal_places=2)
+    img1 = models.ImageField(upload_to='pictures/pics_vehicle', blank=True, null=True)
+    img2 = models.ImageField(upload_to='pictures/pics_vehicle', blank=True, null=True)
+
+
+    def __str__(self):
+        return self.registeration_number
+# def __str__ function is used to return exact name as entered otherwise it will return 'destination obect'
+
+

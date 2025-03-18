@@ -5,11 +5,11 @@ from django.db.models import Avg, Count
 class Blog(models.Model):
     title = models.CharField(null=False, max_length=100)
     blog = models.CharField(null=False, max_length=1000)
-    img1 = models.ImageField(upload_to='pics_blog')
-    img2 = models.ImageField(upload_to='pics_blog')
+    img1 = models.ImageField(upload_to='pictures/pics_blog')
+    img2 = models.ImageField(upload_to='pictures/pics_blog')
     published_date = models.DateTimeField(auto_now_add=True)
     tags = models.CharField(max_length=200, blank=True)
-    featured_image = models.ImageField(upload_to='pics_blog', blank=True, null=True)
+    featured_image = models.ImageField(upload_to='pictures/pics_blog', blank=True, null=True)
 
     def __str__(self):
         return self.title

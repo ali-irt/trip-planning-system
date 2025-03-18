@@ -3,11 +3,8 @@
 {% block content %}
 
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
-    <meta name="description" content="Registration Form">
-    <meta name="author" content="Travelmate">
-    <title>Sign Up - Travelmate</title>
+   
+    <title>Sign Up - WanderWise</title>
 
     <!-- Internal CSS -->
     <style>
@@ -38,15 +35,8 @@
             padding: 20px;
         }
 
-        .wrapper {
-            max-width: 600px;
-            width: 100%;
-            background-color: #ffffff; /* White form background */
-            border-radius: 8px;
-            padding: 20px;
-            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1); /* Subtle shadow for depth */
-        }
-
+       
+     
         .title {
             font-size: 24px;
             font-weight: bold;
@@ -107,7 +97,18 @@
         .btn--green:hover {
             background-color: #218838;
         }
+    .form{
+        background-color: antiquewhite;
+    }
 
+    .wrapper {
+        position: relative;
+        z-index: 2;
+        background-color: rgba(255, 255, 255, 0.683); /* ✅ light bg applied here */
+        border-radius: 8px;
+        padding: 20px;
+        box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
+    }
         h4 {
             text-align: center;
             color: #d9534f; /* Red for error messages */
@@ -116,34 +117,17 @@
     </style>
 </head>
 
+
 <section class="hero-wrap" style="background-image: url('{% static "images/place-1.jpg" %}');">
-    <form action="{% url 'register' %}" method="POST">
-        {% csrf_token %}
-        <div class="page-wrapper">
-            <div class="wrapper">
-                <h2 class="title">Registration Form</h2>
-
-                <label class="label">Username</label>
-                <input type="text" name="username" placeholder="Type your username" minlength="10" maxlength="50" required>
-
-                <label class="label">Last Name</label>
-                <input type="text" name="last_name" placeholder="Enter your last name" required>
-
-                <label class="label">Password</label>
-                <input type="password" name="password" placeholder="Enter your password" required>
-
-                <label class="label">Email</label>
-                <input type="email" name="email" placeholder="Enter your email">
-
-                <button class="btn btn--blue" type="submit">Submit</button>
-                <button class="btn btn--green" type="button" data-url="{% url 'login' %}" onclick="window.location.href=this.dataset.url;">Sign in</button>
-
-                {% for message in messages %}
-                    <h4>{{ message }}</h4>
-                {% endfor %}
-            </div>
-        </div>
-    </form>
+    <div class="overlay"></div>
+    <div class="wrapper">
+        <div class="title">Create Your Travelmate Account</div>
+        <form method="POST" action="{% url 'register' %}">
+            {% csrf_token %}
+            {{ form.as_p }}
+        <button type="submit" class="btn">Register</button>
+        </form>
+    </div>
 </section>
 
 {% endblock %}

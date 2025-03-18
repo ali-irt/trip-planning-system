@@ -10,8 +10,24 @@ class DestinationAdmin(admin.ModelAdmin):
 
     list_filter = ('category', 'city')
 
+
+class HotelAdmin(admin.ModelAdmin):
+    list_display = ['name', 'owner', 'is_approved']
+    list_filter = ['is_approved']
+    actions = ['approve_hotels']
+
+    def approve_hotels(self, request, queryset):
+        queryset.update(is_approved=True)
+    approve_hotels.short_description = "Approve selected hotels"
+
+admin.site.register(Accommodation, HotelAdmin)
+
+
+
 admin.site.register(City)
 admin.site.register(Category)
 admin.site.register(Faq)
 admin.site.register(ReviewRating)
 admin.site.register(Destination, DestinationAdmin)
+admin.site.register(Type)
+admin.site.register(Transportation)

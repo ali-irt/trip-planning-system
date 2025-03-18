@@ -16,9 +16,9 @@ BASE_DIR = Path(__file__).resolve().parent.parent
 
 SECRET_KEY = 'django-insecure-*!3qfub#tpbpamgmu3a2@_i*d#5cj+t8#x89gcnp(rjls%g!=x'
 
-DEBUG = False
+DEBUG = True
 
-ALLOWED_HOSTS = ['https://wanderwise-m7t3.onrender.com']
+ALLOWED_HOSTS = []
 
 INSTALLED_APPS = [
     'django.contrib.admin',
@@ -29,10 +29,7 @@ INSTALLED_APPS = [
     'django.contrib.staticfiles',
     # My external apps
     'Utrip',
-    'estimation',
     'blog',
-    'contact',
-    'trip_proposal',
     'hotels',
     'social_django',
     'django.contrib.sites',
@@ -40,7 +37,18 @@ INSTALLED_APPS = [
     'allauth.account',
     'allauth.socialaccount',
     'allauth.socialaccount.providers.google',
+    'location_field.apps.DefaultConfig',
 ]
+
+# Required settings:
+LOCATION_FIELD = {
+    'map.provider': 'google',  
+    'map.zoom': 10,
+    'search.provider': 'google',  
+    'provider.google.api': '//maps.google.com/maps/api/js?sensor=false',
+    'provider.google.api_key': 'AIzaSyDfHPn_g2tKWKAnb4YVJy-Q0mKYL_7D3_Q',
+}
+
 MIDDLEWARE = [
     'django.middleware.security.SecurityMiddleware',
     'django.contrib.sessions.middleware.SessionMiddleware',
@@ -52,13 +60,12 @@ MIDDLEWARE = [
     "allauth.account.middleware.AccountMiddleware"
 ]
 
-MIDDLEWARE.insert(1, "whitenoise.middleware.WhiteNoiseMiddleware")
 
 SOCIALACCOUNT_PROVIDERS= {
     'google' : {
         'APP':{
-            'client_id': '774590377647-26sjb1uvmurjicr0nj367j7nppi12eua.apps.googleusercontent.com',
-            'secret': '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',
+            'client_id': '611068490642-fq0kn0mjevl0ijmgerul8gd36d83va40.apps.googleusercontent.com',
+            'secret': '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',
             'key':''
         }
     }
@@ -150,6 +157,7 @@ SERVER_EMAIL ='travellmaatte@gmail.com'
 AUTHENTICATION_BACKENDS = [
     'allauth.account.auth_backends.AuthenticationBackend',
     'django.contrib.auth.backends.ModelBackend',  # Default Django authentication
+
 ]
 EMAIL_BACKEND = 'django.core.mail.backends.console.EmailBackend'
 

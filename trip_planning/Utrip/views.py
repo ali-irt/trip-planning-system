@@ -1,20 +1,21 @@
 from django.utils import timezone
 from datetime import timedelta
-from django.views.decorators.csrf import csrf_exempt
-from socket import timeout
-from django.shortcuts import HttpResponse
 from django.contrib import messages
 from django.contrib.auth import authenticate, login ,logout
 from django.contrib.auth.decorators import login_required
 from django.shortcuts import redirect, render, get_object_or_404
 from .models import *
-from estimation.models import *
 from math import ceil 
+from django.http import HttpResponse
 from .forms import *
 from django.contrib.auth.models import User
 from django.core.mail import send_mail
 from django.db.models import Q
-from estimation.views import *
+import logging
+from urllib.parse import quote
+
+logger = logging.getLogger(__name__)
+
 
 def home(request):
     dests = Destination.objects.all()[:5]
@@ -25,23 +26,21 @@ def about(request):
     return render(request, 'about.html')
 
 
-@csrf_exempt
 def register_view(request):
     if request.method == 'POST':
-        email = request.POST.get('email')
-        password = request.POST.get('password')
-
-        if User.objects.filter(email=email).exists():
-            messages.error(request, 'Email is already registered.')
-        else:
-            user = User.objects.create_user( email=email,password=password)
-            user.is_active = False  # Set user to inactive until they verify OTP
+        form = RegisterForm(request.POST)
+        if form.is_valid():
+            user = form.save(commit=False)
+            user.set_password(form.cleaned_data['password'])  # Hash the password
+            user.is_active = False
             user.save()
             send_otp(user)
-            messages.success(request, 'Account created! OTP has been sent to your email for verification.')
+            messages.success(request, 'Account created! OTP sent to your email.')
             return redirect('verify_otp', user_id=user.id)
+    else:
+        form = RegisterForm()
 
-    return render(request, 'register.html')
+    return render(request, 'register.html', {'form': form})
 
 
 def login_view(request):
@@ -266,3 +265,140 @@ def profile_user(request):
 def faq_view(request):
     faq = Faq.objects.all()
     return render(request, 'faq.html',{'faq':faq})
+
+@login_required
+def edit_profile(request):
+    # Create Profile if not exists
+    if not hasattr(request.user, 'profile'):
+        Profile.objects.create(user=request.user)
+
+    user_form = EditUserForm(instance=request.user)
+    profile_form = EditProfileForm(instance=request.user.profile)
+
+    if request.method == 'POST':
+        user_form = EditUserForm(request.POST, instance=request.user)
+        profile_form = EditProfileForm(request.POST, request.FILES, instance=request.user.profile)
+
+        if user_form.is_valid() and profile_form.is_valid():
+            user_form.save()
+            profile_form.save()
+            return redirect('profile_user')  # Change to your desired success redirect
+
+    return render(request, 'edit_profile.html', {
+        'user_form': user_form,
+        'profile_form': profile_form
+    })
+
+
+# Set up logging
+
+@login_required
+def trip_proposal_view(request):
+    if request.method == 'POST':
+        form = TripProposalForm(request.POST)
+        if form.is_valid():
+            trip_proposal = form.save(commit=False)
+            trip_proposal.proposer = request.user
+            trip_proposal.save()
+
+            city = form.cleaned_data.get('city')
+            destination = form.cleaned_data.get('destination')
+            date = form.cleaned_data.get('date')
+            phone_number = form.cleaned_data.get('phone_number')
+
+            # Ensure phone_number is provided
+            if not phone_number:
+                messages.error(request, "Please provide a phone number.")
+                return render(request, 'trip_proposal.html', {'form': form})
+
+            # Generate WhatsApp link
+            whatsapp_link = generate_whatsapp_link(request.user, city, destination, date, phone_number)
+            return redirect(whatsapp_link)
+        else:
+            logger.error(f"Form errors: {form.errors}")
+            messages.error(request, "Form submission failed. Please check your inputs.")
+    else:
+        form = TripProposalForm()
+
+    return render(request, 'trip_proposal.html', {'form': form})
+
+
+
+def proposal_success_view(request):
+    return render(request, 'proposal_success.html')
+
+
+
+
+def generate_whatsapp_link(user_name, city, destination, date, phone_number):
+    
+    location = []
+    if city:
+        location.append(f"city of {city.name}")  # Assuming city has a 'name' field
+    if destination:
+        location.append(f"{destination.destination_spot}")  # Correct field
+    location_text = " and ".join(location) if location else "an unspecified location"
+
+    # Format the message
+    message = f"Your friend {user_name} is inviting you for a trip to {location_text} on {date}."
+
+    # URL-encode the message
+    encoded_message = quote(message)
+
+    # Generate the WhatsApp link
+    whatsapp_link = f"https://wa.me/{phone_number}?text={encoded_message}"
+    logger.info(f"WhatsApp link generated: {whatsapp_link}")
+    return whatsapp_link
+
+def contact(request):
+    if request.method == 'POST':
+        form = ContactForm(request.POST)
+        if form.is_valid():
+            # Extract cleaned data from the form
+            name = form.cleaned_data['name']
+            email = form.cleaned_data['email']
+            message = form.cleaned_data['message']
+
+            # Example: Send an email with the form data
+            send_mail(
+                subject=f"New Contact Form Submission from {name}",
+                message=message,
+                from_email=email,
+                recipient_list=['ali233khalid@gmail.com'],
+                fail_silently=False,
+            )
+
+            return HttpResponse("Thank you for your message. We will get back to you shortly.")
+    else:
+        form = ContactForm()
+
+    return render(request, 'contact.html', {'form': form})
+
+
+
+def estimate_price(request):
+    if request.method == 'POST':
+        form = EstimationForm(request.POST)
+        if form.is_valid():
+            # Retrieve form data
+            destination = form.cleaned_data['destination']
+            accommodation_type = form.cleaned_data['accommodation_type']
+            transportation_type = form.cleaned_data['transportation_type']
+            num_nights = form.cleaned_data['num_nights']
+            num_people = form.cleaned_data['num_people']
+
+            # Calculate accommodation cost
+            accommodation = Accommodation.objects.filter(destination=destination, type=accommodation_type).first()
+            accommodation_cost = accommodation.average_price * num_nights * num_people if accommodation else 0
+
+            # Calculate transportation cost
+            transportation = Transportation.objects.filter(destination=destination, type=transportation_type).first()
+            transportation_cost = transportation.average_price if transportation else 0
+
+            # Calculate total price
+            total_price = accommodation_cost + transportation_cost
+
+            return render(request, 'result.html', {'total_price': total_price})
+    else:
+        form = EstimationForm()
+    return render(request, 'estimate.html', {'form': form})

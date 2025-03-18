@@ -1,16 +1,15 @@
 from django.urls import path, include
 from django.contrib import admin
 from .views import *
-
+from django.conf import settings
+from django.conf.urls.static import static
 
 
 
 urlpatterns = [
     path('', home, name='index'),
-    path('', include('estimation.urls')),
     path('', include('hotels.urls')),
     path('', include('blog.urls')),
-    path('', include('trip_proposal.urls')),
     path('about/', about, name='about'),
 
     path('login/', login_view, name='login'),
@@ -29,7 +28,14 @@ urlpatterns = [
     path('destination_details/<str:destination_name>/', destination_details, name='destination_details'),
 
     path('profile/',profile_user,name='profile_user'),
+    path('edit_profile/',edit_profile,name='edit_profile'),
     path('search/', search, name='search'),
     path('submit_review/<int:DetailedDesc_id>/', submit_review, name='submit_review'),
-    path('faq/', faq_view,name='faq')
+    path('faq/', faq_view,name='faq'),
+    path('propose-trip/', trip_proposal_view, name='propose_trip'),
+    path('proposal-success/', proposal_success_view, name='proposal_success'),
+    path('contact/', contact, name='contact'),
+    path('estimate/', estimate_price, name='estimation'),
+
 ] 
+urlpatterns += static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)

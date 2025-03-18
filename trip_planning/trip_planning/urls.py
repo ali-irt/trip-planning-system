@@ -9,8 +9,6 @@ urlpatterns = [
     path('', include('Utrip.urls')),
     path('', include('hotels.urls')),
     path('', include('blog.urls')),
-    path('', include('contact.urls')),
-    path('', include('trip_proposal.urls')),
     path('admin/', admin.site.urls),
 
 

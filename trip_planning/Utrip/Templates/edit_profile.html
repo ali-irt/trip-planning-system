@@ -1,0 +1,125 @@
+{% extends 'base.html' %}
+{% load static %}
+{% block content %}
+
+<style>
+    .edit-profile-section {
+        position: relative;
+        min-height: 100vh;
+        background-size: cover;
+        background-position: center;
+        background-repeat: no-repeat;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        padding: 60px 15px;
+    }
+
+    .edit-profile-overlay {
+        position: absolute;
+        top: 0;
+        left: 0;
+        height: 100%;
+        width: 100%;
+        background: rgba(0, 0, 0, 0.5);
+        z-index: 1;
+    }
+
+    .edit-profile-form-wrapper {
+        position: relative;
+        z-index: 2;
+        width: 100%;
+        max-width: 700px;
+        background-color: #ffffff;
+        padding: 40px 30px;
+        border-radius: 12px;
+        margin-top: 2in;
+        box-shadow: 0 8px 25px rgba(0, 0, 0, 0.2);
+    }
+
+    .edit-profile-form-wrapper h4 {
+        font-size: 22px;
+        color: #007bff;
+        margin-bottom: 20px;
+        border-bottom: 1px solid #ddd;
+        padding-bottom: 8px;
+    }
+
+    .form-group {
+        margin-bottom: 20px;
+    }
+
+    .form-group label {
+        display: block;
+        font-weight: 600;
+        margin-bottom: 8px;
+        color: #333;
+    }
+
+    .form-group input,
+    .form-group select,
+    .form-group textarea {
+        width: 100%;
+        padding: 10px 12px;
+        font-size: 14px;
+        border: 1px solid #ccc;
+        border-radius: 6px;
+        box-sizing: border-box;
+        transition: border-color 0.3s ease;
+    }
+
+    .form-group input:focus,
+    .form-group select:focus,
+    .form-group textarea:focus {
+        border-color: #007bff;
+        outline: none;
+    }
+
+    .btn--blue {
+        background-color: #007bff;
+        color: #fff;
+        padding: 14px 20px;
+        border: none;
+        font-size: 16px;
+        font-weight: 600;
+        border-radius: 6px;
+        width: 100%;
+        cursor: pointer;
+        transition: background-color 0.3s ease;
+        margin-top: 10px;
+    }
+
+    .btn--blue:hover {
+        background-color: #0056b3;
+    }
+</style>
+
+<section class="edit-profile-section" style="background-image: url('{% static 'images/bg_1.jpeg' %}');">
+    <div class="edit-profile-overlay"></div>
+
+    <div class="edit-profile-form-wrapper">
+        <form method="POST" enctype="multipart/form-data">
+            {% csrf_token %}
+
+            <h4>User Info</h4>
+            {% for field in user_form %}
+                <div class="form-group">
+                    <label>{{ field.label }}</label>
+                    {{ field }}
+                </div>
+            {% endfor %}
+
+            <h4>Profile Info</h4>
+            {% for field in profile_form %}
+                <div class="form-group">
+                    <label>{{ field.label }}</label>
+                    {{ field }}
+                </div>
+            {% endfor %}
+
+            <button type="submit" class="btn btn--blue">Save Changes</button>
+        </form>
+    </div>
+</section>
+
+{% endblock %}

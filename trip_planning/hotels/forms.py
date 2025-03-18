@@ -1,11 +1,23 @@
 from django import forms
-from estimation.models import  Accommodation, Transportation
+from Utrip.models import  Accommodation, Transportation
 
 class hotelform(forms.ModelForm):
     class Meta:
         model = Accommodation
-
-        fields = '__all__'
+        fields = [
+            'owner',
+            'name',
+            'destination',
+            'type',
+            'average_price',
+            'rooms',
+            'contact',
+            'address',
+            'img1',
+            'img2',
+            'business_license',
+            'registration_certificate',
+        ]
 class TransportationForm(forms.ModelForm):
     class Meta:
         model = Transportation

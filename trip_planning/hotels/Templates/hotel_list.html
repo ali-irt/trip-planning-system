@@ -22,24 +22,22 @@
     <div class="row">
       {% for hotel in hotels %}
       <div class="col-md-4 d-flex ftco-animate">
-        <div class="card shadow-sm border-0 rounded">
+        <a href="{% url 'hotel_details' hotel.id %}" class="text-decoration-none w-100">
+          <div class="card shadow-sm border-0 rounded h-100">
             <img src="{% if hotel.img1 %}{{ hotel.img1.url }}{% else %}{% static 'images/default-hotel.jpg' %}{% endif %}" 
-            class="card-img-top" alt="{{ hotel.name }}" style="height: 200px; object-fit: cover;">
-                 <div class="card-body">
-            <h5 class="card-title"><a href="{% url 'hotel_details' hotel.id %}">{{ hotel.name }}</a>
-            </h5>
-            <p class="text-muted">{{ hotel.destination }}</p>
-            <p class="mb-2"><strong>Type:</strong> {{ hotel.type }}</p>
-            <p class="mb-2"><strong>Price:</strong> ${{ hotel.average_price }}</p>
-            <a href="{{ hotel.map }}" target="_blank" class="btn btn-sm btn-outline-primary">View on Map</a>
+              class="card-img-top" alt="{{ hotel.name }}" style="height: 200px; object-fit: cover;">
+            <div class="card-body">
+              <h5 class="card-title text-dark">{{ hotel.name }}</h5>
+              <p class="text-muted">{{ hotel.destination }}</p>
+              <p class="mb-2 text-dark"><strong>Type:</strong> {{ hotel.type }}</p>
+              <p class="mb-2 text-dark"><strong>Price:</strong> ${{ hotel.average_price }}</p>
+              <p class="mb-0 text-primary">View More →</p>
+            </div>
           </div>
-        </div>
-      </div>
-      {% empty %}
-      <div class="col text-center">
-        <p>No hotels available at the moment.</p>
+        </a>
       </div>
       {% endfor %}
+      
     </div>
 
     <!-- Pagination -->
