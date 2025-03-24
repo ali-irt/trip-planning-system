@@ -29,8 +29,6 @@ INSTALLED_APPS = [
     'django.contrib.staticfiles',
     # My external apps
     'Utrip',
-    'blog',
-    'hotels',
     'social_django',
     'django.contrib.sites',
     'allauth',

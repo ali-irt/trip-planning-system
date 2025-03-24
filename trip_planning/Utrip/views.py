@@ -13,6 +13,8 @@ from django.core.mail import send_mail
 from django.db.models import Q
 import logging
 from urllib.parse import quote
+from django.core.paginator import Paginator
+
 
 logger = logging.getLogger(__name__)
 
@@ -402,3 +404,137 @@ def estimate_price(request):
     else:
         form = EstimationForm()
     return render(request, 'estimate.html', {'form': form})
+
+
+
+@login_required
+def hotel_view(request):
+    if request.method == 'POST':
+        form = hotelform(request.POST, request.FILES)
+        if form.is_valid():
+            hotel = form.save(commit=False)
+            hotel.owner = request.user
+            hotel.save()
+            messages.success(request, 'Hotel details saved successfully!')
+            return redirect('hotels')
+        else:
+            messages.error(request, 'There was an error saving the hotel details. Please check the form.')
+    else:
+        form = hotelform()
+        
+    return render(request, 'hotels.html', {'form': form})
+ 
+def trans(request):
+    if request.method == 'POST':
+        form = TransportationForm(request.POST)
+        if form.is_valid():
+            form.save()  # Save the form data to the database
+            messages.success(request, 'Transportation details saved successfully!')
+            return redirect('trans')  # Redirect to a success page or any other view
+        else:
+            messages.error(request, 'There was an error saving the transportation details.')
+    else:
+        form = TransportationForm()
+
+    return render(request, 'vehicle.html', {'form': form})
+
+def hotel_list(request):
+    hotels = Accommodation.objects.filter(is_approved=True)
+    context = {
+        'hotels': hotels
+    }
+    return render(request, 'hotel_list.html', context=context)
+
+   
+def hotel_details(request, hotelid):
+    hotel = get_object_or_404(Accommodation,id=hotelid)
+    context = {
+        'hotel': hotel
+        }
+    return render(request, 'hotel_details.html', context=context)
+
+
+def blog(request):
+    try:
+        # Fetch all blogs
+        post = Blog.objects.all().order_by('-published_date')
+        paginator = Paginator(post, 3)  # Show 3 posts per page
+        page_number = request.GET.get('page')
+        page_obj = paginator.get_page(page_number)
+
+        return render(request, 'blog.html', {'page_obj':page_obj})
+
+    except Blog.DoesNotExist:
+        # Specific exception handling for missing blog entries
+        messages.error(request, 'No blogs found.')
+        return render(request, 'blog.html')  # Render the same page with a message
+
+    except ValueError as e:
+        # Handle specific value-related errors
+        messages.error(request, 'A value error occurred: {}'.format(str(e)))
+        return render(request, 'error.html')  # Render a specific error page
+
+    except KeyError as e:
+        # Handle specific key-related errors
+        messages.error(request, 'A key error occurred: {}'.format(str(e)))
+        return render(request, 'error.html')  # Render a specific error page
+
+    except TypeError as e:
+        # Handle specific type-related errors
+        messages.error(request, 'A type error occurred: {}'.format(str(e)))
+        return render(request, 'error.html')  # Render a specific error page
+
+
+
+def blog_detail(request, id):
+    blog = get_object_or_404(Blog, id=id)
+    reviews = Reviews.objects.filter(blog=blog)  # Fetch related reviews
+
+    # Calculate the number of slides (for the carousel)
+    num_of_reviews = reviews.count()
+    num_of_slides = ceil(num_of_reviews / 4)  # Assuming 4 reviews per slide
+
+    return render(request, 'blog_detail.html', {
+        'blog': blog,
+        'reviews': reviews,
+        'range': range(num_of_slides)  # Pass range for carousel indicators
+    })
+def submit_review_blog(request, id):
+    detailed_blog = get_object_or_404(Blog, id=id)
+
+    if request.method == 'POST':
+        form = ReviewForm(request.POST)
+
+        if form.is_valid():
+            rating = form.cleaned_data['rating']
+            review_text = form.cleaned_data['review']
+            ip_address = request.META.get('REMOTE_ADDR')  # Get user IP
+
+            # Check if the user has already submitted a review
+            existing_review = Reviews.objects.filter(user=request.user, blog=detailed_blog).first()
+
+            if existing_review:
+                # Update existing review
+                existing_review.rating = rating
+                existing_review.review = review_text
+                existing_review.ip = ip_address
+                existing_review.save()
+                messages.success(request, 'Thank you! Your review has been updated.')
+            else:
+                # Create a new review
+                new_review = Reviews(
+                    rating=rating,
+                    review=review_text,
+                    ip=ip_address,
+                    blog=detailed_blog,
+                    user=request.user
+                )
+                new_review.save()
+                messages.success(request, 'Thank you! Your review has been submitted.')
+
+            return redirect('blog_detail', id=detailed_blog.id)  # Redirect to blog detail
+
+    else:
+        form = ReviewForm()
+
+    return render(request, 'blog_detail.html', {'form': form, 'blog': detailed_blog})

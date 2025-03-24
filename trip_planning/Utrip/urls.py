@@ -8,8 +8,6 @@ from django.conf.urls.static import static
 
 urlpatterns = [
     path('', home, name='index'),
-    path('', include('hotels.urls')),
-    path('', include('blog.urls')),
     path('about/', about, name='about'),
 
     path('login/', login_view, name='login'),
@@ -37,5 +35,15 @@ urlpatterns = [
     path('contact/', contact, name='contact'),
     path('estimate/', estimate_price, name='estimation'),
 
-] 
+    path('hotel-registration/', hotel_view, name='hotel_view'),
+    path('vehicle-registration/', trans, name='trans'),
+    path('hotels/', hotel_list ,name='hotels'),
+    path('hotel-details/<int:hotelid>', hotel_details , name= 'hotel_details'),
+    path('blog/', blog, name='blog'),
+    path('blog/<int:id>/',blog, name='blog'),
+    path('blog_detail/', blog_detail, name='blog_detail'),
+    path('blog_detail/<int:id>',blog_detail, name='blog_detail'),
+    path('blog_review/<int:id>/', submit_review_blog, name='blog_review'),
+
+]
 urlpatterns += static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)
