@@ -16,9 +16,9 @@ BASE_DIR = Path(__file__).resolve().parent.parent
 
 SECRET_KEY = 'django-insecure-*!3qfub#tpbpamgmu3a2@_i*d#5cj+t8#x89gcnp(rjls%g!=x'
 
-DEBUG = True
+DEBUG = False
 
-ALLOWED_HOSTS = []
+ALLOWED_HOSTS = ['aliqwer.pythonanywhere.com']
 
 INSTALLED_APPS = [
     'django.contrib.admin',
@@ -40,9 +40,9 @@ INSTALLED_APPS = [
 
 # Required settings:
 LOCATION_FIELD = {
-    'map.provider': 'google',  
+    'map.provider': 'google',
     'map.zoom': 10,
-    'search.provider': 'google',  
+    'search.provider': 'google',
     'provider.google.api': '//maps.google.com/maps/api/js?sensor=false',
     'provider.google.api_key': 'AIzaSyDfHPn_g2tKWKAnb4YVJy-Q0mKYL_7D3_Q',
 }
@@ -76,7 +76,10 @@ ROOT_URLCONF = 'trip_planning.urls'
 TEMPLATES = [
     {
         'BACKEND': 'django.template.backends.django.DjangoTemplates',
-        'DIRS': [],
+        'DIRS': [
+                    os.path.join(BASE_DIR, 'trip_planning/templates'),
+                    os.path.join(BASE_DIR, 'trip_planning/Utrip/templates'),
+                ],
         'APP_DIRS': True,
         'OPTIONS': {
             'context_processors': [
@@ -123,17 +126,14 @@ USE_I18N = True
 
 USE_TZ = True
 
-# Corrected STATIC_URL with a trailing slash
-# settings.py
-
 STATIC_URL = '/static/'
 
-# Add this line
+# This is the folder where Django will collect all static files
 STATIC_ROOT = os.path.join(BASE_DIR, 'staticfiles')
 
-# Ensure STATICFILES_DIRS is defined correctly
+# This is where your static files live **before collection**
 STATICFILES_DIRS = [
-    os.path.join(BASE_DIR, 'static'),  # Only if you have a 'static' folder
+    os.path.join(BASE_DIR, 'trip_planning/Utrip/static'),  # Adjust if needed
 ]
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 # to receive messages from user
@@ -157,8 +157,11 @@ AUTHENTICATION_BACKENDS = [
     'django.contrib.auth.backends.ModelBackend',  # Default Django authentication
 
 ]
-EMAIL_BACKEND = 'django.core.mail.backends.console.EmailBackend'
+EMAIL_BACKEND = 'django.core.mail.backends.Email.EmailBackend'
 
 
-# settings.py
 MEDIA_URL = '/media/'
+MEDIA_ROOT = os.path.join(BASE_DIR, 'trip_planning', 'media')
+if 'PYTHONANYWHERE_DOMAIN' in os.environ:
+    MEDIA_ROOT = '/home/aliqwer/trip-planning-system/media'
+

@@ -5,13 +5,14 @@ from django.contrib.auth import authenticate, login ,logout
 from django.contrib.auth.decorators import login_required
 from django.shortcuts import redirect, render, get_object_or_404
 from .models import *
-from math import ceil 
+from math import ceil
 from django.http import HttpResponse
 from .forms import *
 from django.contrib.auth.models import User
 from django.core.mail import send_mail
 from django.db.models import Q
 import logging
+from django.conf import settings
 from urllib.parse import quote
 from django.core.paginator import Paginator
 
@@ -160,7 +161,7 @@ def submit_review(request , DetailedDesc_id):
                     destination=detailed_desc,
                     user=request.user
                 )
-                
+
                 new_review.save()
                 messages.success(request, 'Thank you! Your review has been submitted.')
 
@@ -333,7 +334,7 @@ def proposal_success_view(request):
 
 
 def generate_whatsapp_link(user_name, city, destination, date, phone_number):
-    
+
     location = []
     if city:
         location.append(f"city of {city.name}")  # Assuming city has a 'name' field
@@ -421,9 +422,9 @@ def hotel_view(request):
             messages.error(request, 'There was an error saving the hotel details. Please check the form.')
     else:
         form = hotelform()
-        
+
     return render(request, 'hotels.html', {'form': form})
- 
+
 def trans(request):
     if request.method == 'POST':
         form = TransportationForm(request.POST)
@@ -445,7 +446,7 @@ def hotel_list(request):
     }
     return render(request, 'hotel_list.html', context=context)
 
-   
+
 def hotel_details(request, hotelid):
     hotel = get_object_or_404(Accommodation,id=hotelid)
     context = {
@@ -457,32 +458,20 @@ def hotel_details(request, hotelid):
 def blog(request):
     try:
         # Fetch all blogs
-        post = Blog.objects.all().order_by('-published_date')
-        paginator = Paginator(post, 3)  # Show 3 posts per page
+        posts = Blog.objects.all().order_by('-published_date')
+        paginator = Paginator(posts, 3)  # Show 3 posts per page
         page_number = request.GET.get('page')
         page_obj = paginator.get_page(page_number)
 
-        return render(request, 'blog.html', {'page_obj':page_obj})
+        return render(request, 'blog.html', {'page_obj': page_obj, 'MEDIA_URL': settings.MEDIA_URL})
 
     except Blog.DoesNotExist:
-        # Specific exception handling for missing blog entries
         messages.error(request, 'No blogs found.')
-        return render(request, 'blog.html')  # Render the same page with a message
+        return render(request, 'blog.html')
 
-    except ValueError as e:
-        # Handle specific value-related errors
-        messages.error(request, 'A value error occurred: {}'.format(str(e)))
-        return render(request, 'error.html')  # Render a specific error page
-
-    except KeyError as e:
-        # Handle specific key-related errors
-        messages.error(request, 'A key error occurred: {}'.format(str(e)))
-        return render(request, 'error.html')  # Render a specific error page
-
-    except TypeError as e:
-        # Handle specific type-related errors
-        messages.error(request, 'A type error occurred: {}'.format(str(e)))
-        return render(request, 'error.html')  # Render a specific error page
+    except (ValueError, KeyError, TypeError) as e:
+        messages.error(request, f'An error occurred: {str(e)}')
+        return render(request, 'error.html')
 
 
 

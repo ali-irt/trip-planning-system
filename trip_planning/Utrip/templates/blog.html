@@ -1,7 +1,7 @@
 {% extends 'base.html'%}
 {% load static %}
 {% block content %}
-    
+
     <section class="hero-wrap hero-wrap-2" style="background-image: url({% static 'images/bg_1.jpeg' %})" data-stellar-background-ratio="0.5">
       <div class="overlay"></div>
       <div class="container">
@@ -15,14 +15,16 @@
     </section>
 
     <section class="ftco-section">
+        {{ post.featured_image.url }}
+
       <div class="container">
         <div class="row d-flex">
           {% for post in page_obj %}
           <div class="col-md-3 d-flex ftco-animate">
             <div class="blog-entry justify-content-end">
               <div class="text">
-                <a href="{% url 'blog_detail' post.id %}" class="block-20 img" 
-                   style="background-image: url('{{ post.featured_image.url }}');">
+                <a href="{% url 'blog_detail' post.id %}" class="block-20 img"
+                    style="background-image: url('{{ MEDIA_URL }}{{ post.featured_image }}');">
                 </a>
                 <div class="meta mb-3">
                   <div><a href="#">{{ post.published_date|date:"F d, Y" }}</a></div>
@@ -34,7 +36,7 @@
           </div>
           {% endfor %}
         </div>
-    
+
         <div class="row mt-5">
           <div class="col text-center">
             <div class="block-27">
@@ -42,13 +44,13 @@
                 {% if page_obj.has_previous %}
                 <li><a href="?page={{ page_obj.previous_page_number }}">&lt;</a></li>
                 {% endif %}
-    
+
                 {% for num in page_obj.paginator.page_range %}
                 <li class="{% if page_obj.number == num %}active{% endif %}">
                   <a href="?page={{ num }}">{{ num }}</a>
                 </li>
                 {% endfor %}
-    
+
                 {% if page_obj.has_next %}
                 <li><a href="?page={{ page_obj.next_page_number }}">&gt;</a></li>
                 {% endif %}
@@ -58,5 +60,5 @@
         </div>
       </div>
     </section>
-    
+
 {% endblock %}
