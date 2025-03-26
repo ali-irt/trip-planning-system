@@ -1,14 +1,14 @@
 {% extends 'base.html'%}
 {% load static %}
 {% block content %}
-    
-    <section class="hero-wrap hero-wrap-2" style="background-image: url({% static 'images/bg_1.jpeg' %})" data-stellar-background-ratio="0.5">
-      <div class="overlay"></div>
+
+    <section class="hero-wrap hero-wrap-2" style="background-image: url({% static 'images/bg_1.jpeg' %}); background-position: center center;" data-stellar-background-ratio="0.5">
+      <div class="overlay" style="background-color: rgba(0, 0, 0, 0.6);"></div>
       <div class="container">
         <div class="row no-gutters slider-text js-fullheight align-items-center justify-content-center">
           <div class="col-md-9 ftco-animate pb-0 text-center">
-          	<p class="breadcrumbs"><span class="mr-2"><a href="index.html">Home <i class="fa fa-chevron-right"></i></a></span> <span>Blog <i class="fa fa-chevron-right"></i></span></p>
-            <h1 class="mb-3 bread">Blogs</h1>
+          	<p class="breadcrumbs"><span class="mr-2"><a href="index.html" style="color: #f8f9fa;">Home <i class="fa fa-chevron-right"></i></a></span> <span style="color: #f8f9fa;">Blog <i class="fa fa-chevron-right"></i></span></p>
+            <h1 class="mb-3 bread" style="color: white; font-size: 3rem; text-shadow: 1px 1px 3px rgba(0,0,0,0.3);">Our Blog Posts</h1>
           </div>
         </div>
       </div>
@@ -18,39 +18,58 @@
       <div class="container">
         <div class="row d-flex">
           {% for post in page_obj %}
-          <div class="col-md-3 d-flex ftco-animate">
-            <div class="blog-entry justify-content-end">
-              <div class="text">
+          <div class="col-md-4 col-lg-3 d-flex ftco-animate mb-4">
+            <div class="blog-entry justify-content-end w-100" style="border: 1px solid #e9ecef; border-radius: 8px; overflow: hidden; box-shadow: 0 2px 10px rgba(0,0,0,0.05); transition: all 0.3s ease;">
+              <div class="text p-4">
                 <a href="{% url 'blog_detail' post.id %}" class="block-20 img" 
-                   style="background-image: url('{{ post.featured_image.url }}');">
+                    style="background-image: url('{{ MEDIA_URL }}{{ post.featured_image }}'); 
+                           height: 200px; 
+                           background-size: cover;
+                           display: block;
+                           transition: transform 0.3s ease;">
                 </a>
-                <div class="meta mb-3">
-                  <div><a href="#">{{ post.published_date|date:"F d, Y" }}</a></div>
+                <div class="meta mb-2 mt-3">
+                  <div><a href="#" style="color: #6c757d;"><i class="far fa-calendar-alt mr-2"></i>{{ post.published_date|date:"F d, Y" }}</a></div>
                 </div>
-                <h3 class="heading"><a href="{{ post.get_absolute_url }}">{{ post.title }}</a></h3>
-                <div><a href="#" class="meta-chat">{{ post.blog|truncatechars:50 }}</a></div>
+                <h3 class="heading mb-3"><a href="{{ post.get_absolute_url }}" style="color: #343a40; font-size: 1.2rem;">{{ post.title }}</a></h3>
+                <p class="mb-0" style="color: #6c757d; line-height: 1.5;">{{ post.blog|truncatechars:100 }}</p>
+                <a href="{{ post.get_absolute_url }}" class="btn btn-primary btn-sm mt-3">Read More</a>
               </div>
             </div>
           </div>
           {% endfor %}
         </div>
-    
+
         <div class="row mt-5">
           <div class="col text-center">
             <div class="block-27">
-              <ul>
+              <ul class="pagination">
                 {% if page_obj.has_previous %}
-                <li><a href="?page={{ page_obj.previous_page_number }}">&lt;</a></li>
-                {% endif %}
-    
-                {% for num in page_obj.paginator.page_range %}
-                <li class="{% if page_obj.number == num %}active{% endif %}">
-                  <a href="?page={{ num }}">{{ num }}</a>
+                <li class="page-item">
+                  <a href="?page={{ page_obj.previous_page_number }}" class="page-link" aria-label="Previous">
+                    <span aria-hidden="true">&laquo;</span>
+                  </a>
                 </li>
+                {% endif %}
+
+                {% for num in page_obj.paginator.page_range %}
+                  {% if page_obj.number == num %}
+                    <li class="page-item active">
+                      <a href="?page={{ num }}" class="page-link">{{ num }}</a>
+                    </li>
+                  {% elif num > page_obj.number|add:'-3' and num < page_obj.number|add:'3' %}
+                    <li class="page-item">
+                      <a href="?page={{ num }}" class="page-link">{{ num }}</a>
+                    </li>
+                  {% endif %}
                 {% endfor %}
-    
+
                 {% if page_obj.has_next %}
-                <li><a href="?page={{ page_obj.next_page_number }}">&gt;</a></li>
+                <li class="page-item">
+                  <a href="?page={{ page_obj.next_page_number }}" class="page-link" aria-label="Next">
+                    <span aria-hidden="true">&raquo;</span>
+                  </a>
+                </li>
                 {% endif %}
               </ul>
             </div>
@@ -58,5 +77,5 @@
         </div>
       </div>
     </section>
-    
+
 {% endblock %}

@@ -5,27 +5,6 @@ from django.core.exceptions import ValidationError
 from datetime import date
 
 
-class ReviewForm1(forms.ModelForm):
-    RATING_CHOICES = [
-        (5, "5 Stars"),
-        (4.5, "4.5 Stars"),
-        (4, "4 Stars"),
-        (3.5, "3.5 Stars"),
-        (3, "3 Stars"),
-        (2.5, "2.5 Stars"),
-        (2, "2 Stars"),
-        (1.5, "1.5 Stars"),
-        (1, "1 Star"),
-        (0.5, "0.5 Star"),
-    ]
-
-    rating = forms.ChoiceField(choices=RATING_CHOICES, widget=forms.RadioSelect)
-    review = forms.CharField(widget=forms.Textarea(attrs={"rows": 4, "class": "form-control", "placeholder": "Write your review here..."}))
-
-    class Meta:
-        model = ReviewRating
-        fields = ['rating', 'review']
-
 
 class RegisterForm(forms.ModelForm):
     password = forms.CharField(widget=forms.PasswordInput)
@@ -157,21 +136,22 @@ class TransportationForm(forms.ModelForm):
         fields = '__all__'
 
 class ReviewForm(forms.ModelForm):
-    RATING_CHOICES = [
-        (5, "5 Stars"),
-        (4.5, "4.5 Stars"),
-        (4, "4 Stars"),
-        (3.5, "3.5 Stars"),
-        (3, "3 Stars"),
-        (2.5, "2.5 Stars"),
-        (2, "2 Stars"),
-        (1.5, "1.5 Stars"),
-        (1, "1 Star"),
-        (0.5, "0.5 Star"),
-    ]
+    rating = forms.FloatField(
+        widget=forms.HiddenInput(),  # Hidden because JS will update it
+        min_value=0.5,
+        max_value=5,
+        required=True
+    )
 
-    rating = forms.ChoiceField(choices=RATING_CHOICES, widget=forms.RadioSelect)
-    review = forms.CharField(widget=forms.Textarea(attrs={"rows": 4, "class": "form-control", "placeholder": "Write your review here..."}))
+    review = forms.CharField(
+        widget=forms.Textarea(attrs={
+            "rows": 5,
+            "class": "form-control",
+            "placeholder": "Share your experience...",
+            "minlength": "20",
+        }),
+        required=True
+    )
 
     class Meta:
         model = Reviews

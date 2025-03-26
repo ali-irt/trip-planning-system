@@ -19,10 +19,10 @@ urlpatterns = [
 
   # If destination_spot is provided, it will be captured
     path('destination_list/<str:destination_spot>/', destination_list, name='destination_list'),
-    
+
     # If destination_spot is not provided, this pattern will match (with an empty string or None as destination_spot)
     path('destination_list/', destination_list, name='destination_list'),
-    
+
     path('destination_details/<str:destination_name>/', destination_details, name='destination_details'),
 
     path('profile/',profile_user,name='profile_user'),
@@ -40,10 +40,7 @@ urlpatterns = [
     path('hotels/', hotel_list ,name='hotels'),
     path('hotel-details/<int:hotelid>', hotel_details , name= 'hotel_details'),
     path('blog/', blog, name='blog'),
-    path('blog/<int:id>/',blog, name='blog'),
-    path('blog_detail/', blog_detail, name='blog_detail'),
-    path('blog_detail/<int:id>',blog_detail, name='blog_detail'),
+    path('blog/<int:id>/', blog_detail, name='blog_detail'),
     path('blog_review/<int:id>/', submit_review_blog, name='blog_review'),
 
 ]
-urlpatterns += static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)

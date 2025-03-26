@@ -5,6 +5,7 @@ from django.core.validators import MinValueValidator
 import random
 from django.db.models.signals import post_save
 from django.dispatch import receiver
+from django.urls import reverse
 # Create your models here.
 
 
@@ -189,6 +190,8 @@ class Blog(models.Model):
 
     def __str__(self):
         return self.title
+    def get_absolute_url(self):
+        return reverse('blog_detail', kwargs={'id': self.id})
 class Reviews(models.Model):
     user = models.ForeignKey(User, on_delete=models.CASCADE)
     blog = models.ForeignKey(Blog, on_delete=models.CASCADE,)

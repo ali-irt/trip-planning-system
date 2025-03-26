@@ -3,6 +3,38 @@
 
 {% block content %}
 
+<style>
+    .star-rating {
+    display: inline-block;
+    font-size: 0;
+    unicode-bidi: bidi-override;
+    direction: rtl;
+}
+.star-rating input {
+    display: none;
+}
+.star-rating label {
+    color: #ccc;
+    font-size: 30px;
+    display: inline-block;
+    cursor: pointer;
+}
+.star-rating label:before {
+    content: "★";
+}
+.star-rating label.half:before {
+    content: "☆";
+    position: absolute;
+    width: 50%;
+    overflow: hidden;
+}
+.star-rating input:checked ~ label,
+.star-rating label.active,
+.star-rating label:hover,
+.star-rating label:hover ~ label {
+    color: gold;
+}
+</style>
 <!-- Hero Section with Parallax and Overlay -->
 <section class="hero-wrap hero-wrap-2" style="background-image: url({% static 'images/bg_1.jpeg' %});" data-stellar-background-ratio="0.5">
     <div class="overlay"></div>
@@ -125,21 +157,54 @@
     </div>
 </div>
 
-<!-- Review Form with Custom Style -->
-<div class="container mt-5 mb-5">
-    <h5 class="font-weight-bold">Write Your Review</h5>
-    <form action="" method="POST" class="form">
-        {% csrf_token %}
-        <div class="form-group">
-            {{ form.as_p }}
-        </div>
 
-        {% if user.is_authenticated %}
-        <button type="submit" class="btn btn-primary rounded-pill btn-lg">Submit Review</button>
-        {% else %}
-        <p class="text-danger mt-2">You need to be logged in to leave a review.</p>
-        {% endif %}
-    </form>
+
+<!-- Review Form -->
+<form method="post" id="review-form">
+    {% csrf_token %}
+    
+    <!-- Star Rating UI -->
+    <div class="star-rating">
+        {% for i in "54321" %}
+            <input type="radio" id="star-{{ i }}" name="rating" value="{{ i }}" />
+            <label for="star-{{ i }}" title="{{ i }} stars"></label>
+        {% endfor %}
+        <!-- Half-star inputs (optional, if you want 4.5, 3.5, etc.) -->
+        {% for i in "4321" %}
+            <input type="radio" id="star-{{ i }}5" name="rating" value="{{ i }}.5" />
+            <label class="half" for="star-{{ i }}5" title="{{ i }}.5 stars"></label>
+        {% endfor %}
+    </div>
+
+    {{ form.review }}
+    <button type="submit" class="btn btn-primary">Submit</button>
+</form>
+
+<!-- Hidden field for actual rating submission -->
+{{ form.rating }}
 </div>
+</div>
+<script>$(document).ready(function() {
+    // Update hidden field when a star is clicked
+    $('.star-rating input').on('click', function() {
+        $('#id_rating').val($(this).val());
+    });
 
+    // Optional: Highlight stars on hover
+    $('.star-rating label').hover(
+        function() {
+            $(this).parent().find('label').removeClass('active');
+            $(this).addClass('active').prevAll('label').addClass('active');
+        },
+        function() {
+            $('.star-rating label').removeClass('active');
+            var selected = $('.star-rating input:checked');
+            if (selected.length) {
+                var label = $('label[for="' + selected.attr('id') + '"]');
+                label.addClass('active').prevAll('label').addClass('active');
+            }
+        }
+    );
+});</script>
 {% endblock %}
+
