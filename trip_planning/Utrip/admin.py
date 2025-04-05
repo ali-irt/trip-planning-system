@@ -1,6 +1,13 @@
 from django.contrib import admin
 from .models import *
 
+
+admin.site.site_header = "WanderWise Admin"         # Top left corner title
+admin.site.site_title = "WanderWise Admin Portal"   # Browser tab title
+admin.site.index_title = "Welcome to WanderWise Admin"   # Dashboard welcome title
+
+
+
 class DestinationAdmin(admin.ModelAdmin):
     fields = ('city', 'destination_spot', 'keywords', 'category', 'featured_img', 'img1', 'img2', 'description')
 

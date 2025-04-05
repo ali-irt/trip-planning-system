@@ -170,29 +170,62 @@ def submit_review(request , DetailedDesc_id):
     # If not a POST request or form is invalid, redirect to the referring URL
     return redirect(url)
 
-
+from django.shortcuts import render
+from django.db.models import Q
+from django.contrib import messages
+from .models import Destination, City, Accommodation, Transportation, Blog
 
 def search(request):
     query = request.GET.get('search', '').strip()
     if not query:
         messages.warning(request, "Please enter a search term.")
-        return render(request, 'search_results.html', {'allspots': [], 'query': query})
+        return render(request, 'search_results.html', {'results': [], 'query': query})
 
     if len(query) > 78:
-        allspots = Destination.objects.none()
+        results = []
     else:
-        alldestination = Destination.objects.filter(destination_spot=query)
-        allprovince = Destination.objects.filter(province__icontains=query)
-        allcity = Destination.objects.filter(CITY__icontains=query)
-        allkey = Destination.objects.filter(Keywords__icontains=query)
-        allspots = alldestination.union(allcity, allprovince, allkey)
+        destination_results = Destination.objects.filter(
+            Q(destination_spot__icontains=query) |
+            Q(keywords__icontains=query) |
+            Q(description__icontains=query) |
+            Q(city__name__icontains=query) |
+            Q(city__province__icontains=query) |
+            Q(category__category_name__icontains=query)
+        ).distinct()
 
-    if not allspots.exists():
+        accommodation_results = Accommodation.objects.filter(
+            Q(name__icontains=query) |
+            Q(owner__icontains=query) |
+            Q(destination__name__icontains=query) |
+            Q(type__type__icontains=query) |
+            Q(address__icontains=query)
+        ).distinct()
+
+        transportation_results = Transportation.objects.filter(
+            Q(origin__name__icontains=query) |
+            Q(origin__province__icontains=query) |
+            Q(registeration_number__icontains=query) |
+            Q(type__icontains=query)
+        ).distinct()
+
+        blog_results = Blog.objects.filter(
+            Q(title__icontains=query) |
+            Q(blog__icontains=query) |
+            Q(tags__icontains=query)
+        ).distinct()
+
+        # Combine all results in a dictionary
+        results = {
+            'destinations': destination_results,
+            'accommodations': accommodation_results,
+            'transportation': transportation_results,
+            'blogs': blog_results,
+        }
+
+    if not any(len(qs) > 0 for qs in results.values()):
         messages.warning(request, "No search results found. Please refine your query.")
 
-    params = {'allspots': allspots, 'query': query}
-    return render(request, 'search_results.html', params)@login_required(login_url='login')
-
+    return render(request, 'search_results.html', {'results': results, 'query': query})
 
 def send_otp(user):
     otp, created = OTP.objects.get_or_create(user=user)
