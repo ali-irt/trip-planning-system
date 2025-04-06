@@ -28,7 +28,7 @@ urlpatterns = [
     path('profile/',profile_user,name='profile_user'),
     path('edit_profile/',edit_profile,name='edit_profile'),
     path('search/', search, name='search'),
-    path('submit_review/<int:DetailedDesc_id>/', submit_review, name='submit_review'),
+    path('submit-review/<str:model_name>/<int:object_id>/', submit_review, name='submit_review'),
     path('faq/', faq_view,name='faq'),
     path('propose-trip/', trip_proposal_view, name='propose_trip'),
     path('proposal-success/', proposal_success_view, name='proposal_success'),
@@ -41,6 +41,5 @@ urlpatterns = [
     path('hotel-details/<int:hotelid>', hotel_details , name= 'hotel_details'),
     path('blog/', blog, name='blog'),
     path('blog/<int:id>/', blog_detail, name='blog_detail'),
-    path('blog_review/<int:id>/', submit_review_blog, name='blog_review'),
 
 ]

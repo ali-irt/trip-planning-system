@@ -134,7 +134,7 @@ class TransportationForm(forms.ModelForm):
     class Meta:
         model = Transportation
         fields = '__all__'
-
+#to store blog reviews
 class ReviewForm(forms.ModelForm):
     rating = forms.FloatField(
         widget=forms.HiddenInput(),  # Hidden because JS will update it
@@ -154,5 +154,7 @@ class ReviewForm(forms.ModelForm):
     )
 
     class Meta:
-        model = Reviews
+        model = Review
         fields = ['rating', 'review']
+
+

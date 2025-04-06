@@ -3,6 +3,7 @@ from datetime import timedelta
 from django.contrib import messages
 from django.contrib.auth import authenticate, login ,logout
 from django.contrib.auth.decorators import login_required
+from django.views.decorators.csrf import csrf_exempt
 from django.shortcuts import redirect, render, get_object_or_404
 from .models import *
 from math import ceil
@@ -15,6 +16,7 @@ import logging
 from django.conf import settings
 from urllib.parse import quote
 from django.core.paginator import Paginator
+
 
 
 logger = logging.getLogger(__name__)
@@ -110,7 +112,7 @@ def destination_details(request, destination_name):
     accommodations = Accommodation.objects.filter(destination=dest.city)  # Use the related city
 
     # Retrieve reviews related to this destination
-    reviews = ReviewRating.objects.filter(destination=dest)
+    reviews = Review.objects.filter(destination=dest)
 
     # Initialize the review form
     form = ReviewForm()
@@ -130,50 +132,66 @@ def destination_details(request, destination_name):
 
     return render(request, 'destination_details.html', context)
 
-def submit_review(request , DetailedDesc_id):
-    url = request.META.get('HTTP_REFERER')  # Capture the referring URL
+from django.contrib.contenttypes.models import ContentType
+
+from django.shortcuts import get_object_or_404, redirect
+from django.contrib.contenttypes.models import ContentType
+from .forms import ReviewForm
+from .models import Review
+from django.contrib import messages
+
+def submit_review(request, model_name, object_id):
+    url = request.META.get('HTTP_REFERER')
+
     if request.method == 'POST':
         form = ReviewForm(request.POST)
-        detailed_desc = get_object_or_404(Destination, id=DetailedDesc_id)  # Use get_object_or_404 for better error handling
+
+        try:
+            # Dynamically get the model class
+            model = ContentType.objects.get(model=model_name).model_class()
+            content_object = get_object_or_404(model, id=object_id)
+        except ContentType.DoesNotExist:
+            messages.error(request, "Invalid content type.")
+            print('Invalid content type:', model_name)
+            return redirect(url)
 
         if form.is_valid():
             rating = form.cleaned_data['rating']
             review = form.cleaned_data['review']
+            ip_address = request.META.get('REMOTE_ADDR')
 
-            ip_address = request.META.get('REMOTE_ADDR')  # Capture the user's IP address
-
-            # Try to get an existing review by the user for the given destination
-            existing_review = ReviewRating.objects.filter(user=request.user, destination=detailed_desc).first()
+            # Check if the user has already reviewed this object
+            existing_review = Review.objects.filter(
+                user=request.user,
+                content_type=ContentType.objects.get_for_model(content_object),
+                object_id=content_object.id
+            ).first()
 
             if existing_review:
-                # Update the existing review
                 existing_review.rating = rating
                 existing_review.review = review
                 existing_review.ip = ip_address
                 existing_review.save()
-                messages.success(request, 'Thank you! Your review has been updated.')
+                messages.success(request, "Your review was updated!")
             else:
-                # Create a new review
-                new_review = ReviewRating(
+                Review.objects.create(
+                    user=request.user,
                     rating=rating,
                     review=review,
                     ip=ip_address,
-                    destination=detailed_desc,
-                    user=request.user
+                    content_object=content_object
                 )
-
-                new_review.save()
-                messages.success(request, 'Thank you! Your review has been submitted.')
+                messages.success(request, "Thanks! Your review was submitted.")
 
             return redirect(url)
+        else:
+            messages.error(request, "Form is invalid.")
+            print("Form errors:", form.errors)
 
-    # If not a POST request or form is invalid, redirect to the referring URL
     return redirect(url)
 
-from django.shortcuts import render
-from django.db.models import Q
-from django.contrib import messages
-from .models import Destination, City, Accommodation, Transportation, Blog
+
+
 
 def search(request):
     query = request.GET.get('search', '').strip()
@@ -506,60 +524,23 @@ def blog(request):
         messages.error(request, f'An error occurred: {str(e)}')
         return render(request, 'error.html')
 
-
-
 def blog_detail(request, id):
     blog = get_object_or_404(Blog, id=id)
-    reviews = Reviews.objects.filter(blog=blog)
+    
+    # Use ContentType to filter generic relation
+    content_type = ContentType.objects.get_for_model(Blog)
+    reviews = Review.objects.filter(content_type=content_type, object_id=blog.id)
 
     num_of_reviews = reviews.count()
     num_of_slides = ceil(num_of_reviews / 4)
 
-    print(f"Total Reviews: {num_of_reviews}, Slides: {num_of_slides}")
-
-    return render(request, 'blog_detail.html', {
-        'blog': blog,
-        'reviews': reviews,
-        'slide_range': range(num_of_slides) if num_of_slides > 0 else range(1)  # Ensure at least one slide
-    })
-
-
-def submit_review_blog(request, id):
-    detailed_blog = get_object_or_404(Blog, id=id)
-
-    if request.method == 'POST':
-        form = ReviewForm(request.POST)
-
-        if form.is_valid():
-            rating = form.cleaned_data['rating']
-            review_text = form.cleaned_data['review']
-            ip_address = request.META.get('REMOTE_ADDR')  # Get user IP
-
-            # Check if the user has already submitted a review
-            existing_review = Reviews.objects.filter(user=request.user, blog=detailed_blog).first()
-
-            if existing_review:
-                # Update existing review
-                existing_review.rating = rating
-                existing_review.review = review_text
-                existing_review.ip = ip_address
-                existing_review.save()
-                messages.success(request, 'Thank you! Your review has been updated.')
-            else:
-                # Create a new review
-                new_review = Reviews(
-                    rating=rating,
-                    review=review_text,
-                    ip=ip_address,
-                    blog=detailed_blog,
-                    user=request.user
-                )
-                new_review.save()
-                messages.success(request, 'Thank you! Your review has been submitted.')
-
-            return redirect('blog_detail', id=detailed_blog.id)  # Redirect to blog detail
-
-    else:
-        form = ReviewForm()
-
-    return render(request, 'blog_detail.html', {'form': form, 'blog': detailed_blog})
+    review_chunks = [reviews[i:i + 4] for i in range(0, num_of_reviews, 4)]
+    context = {
+            'blog': blog,
+            'review_chunks': review_chunks,
+            'content_type': content_type,
+            'content_object': blog,
+            'form': ReviewForm(),
+            'slide_range': range(num_of_slides) if num_of_slides > 0 else range(1)
+    }
+    return render(request, 'blog_detail.html',context) 

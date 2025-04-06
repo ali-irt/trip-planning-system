@@ -157,7 +157,7 @@ AUTHENTICATION_BACKENDS = [
     'django.contrib.auth.backends.ModelBackend',  # Default Django authentication
 
 ]
-EMAIL_BACKEND = 'django.core.mail.backends.Email.EmailBackend'
+EMAIL_BACKEND = 'django.core.mail.backends.console.EmailBackend'
 
 
 MEDIA_URL = '/media/'

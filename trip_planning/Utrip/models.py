@@ -6,6 +6,13 @@ import random
 from django.db.models.signals import post_save
 from django.dispatch import receiver
 from django.urls import reverse
+from django.contrib.contenttypes.models import ContentType
+from django.contrib.contenttypes.fields import GenericForeignKey
+from django.db import models
+from django.conf import settings
+
+
+
 # Create your models here.
 
 
@@ -48,30 +55,6 @@ class Faq(models.Model):
         return self.question
 
 
-
-class ReviewRating(models.Model):
-    destination = models.ForeignKey(Destination, on_delete=models.CASCADE, related_name='reviews')
-    user = models.ForeignKey(User, on_delete=models.CASCADE)
-    subject = models.CharField(max_length=100, blank=True)
-    review = models.TextField(blank=True)
-    rating = models.FloatField(validators=[MinValueValidator(1.0)])  # Ensure a minimum rating
-    ip = models.CharField(max_length=20, blank=True)
-    status = models.BooleanField(default=True)
-    created_at = models.DateTimeField(auto_now_add=True)
-    updated_at = models.DateTimeField(auto_now=True)
-
-    def __str__(self):
-        return self.subject
-
-    @property
-    def average_review(self):
-        reviews = self.destination.reviews.filter(status=True).aggregate(average=Avg('rating'))
-        return float(reviews['average']) if reviews['average'] is not None else 0
-
-    @property
-    def count_review(self):
-        reviews = self.destination.reviews.filter(status=True).aggregate(count=Count('id'))
-        return int(reviews['count']) if reviews['count'] is not None else 0
 
 
 class OTP(models.Model):
@@ -192,24 +175,18 @@ class Blog(models.Model):
         return self.title
     def get_absolute_url(self):
         return reverse('blog_detail', kwargs={'id': self.id})
-class Reviews(models.Model):
-    user = models.ForeignKey(User, on_delete=models.CASCADE)
-    blog = models.ForeignKey(Blog, on_delete=models.CASCADE,)
-    subject = models.CharField(max_length=100, blank=True)
-    review = models.TextField(blank=True)
+class Review(models.Model):
+    user = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.CASCADE)
     rating = models.FloatField()
-    ip = models.CharField(max_length=20, blank=True)
-    status = models.BooleanField(default=True)
+    review = models.TextField()
+    ip = models.GenericIPAddressField()
+
+    # Generic relation to Blog, Destination, or Hotel
+    content_type = models.ForeignKey(ContentType, on_delete=models.CASCADE)
+    object_id = models.PositiveIntegerField()
+    content_object = GenericForeignKey('content_type', 'object_id')
+
     created_at = models.DateTimeField(auto_now_add=True)
-    updated_at = models.DateTimeField(auto_now=True)
 
     def __str__(self):
-        return self.subject
-
-    def average_review(self):
-        reviews = Reviews.objects.filter(blog=self, status=True).aggregate(average=Avg('rating'))
-        return float(reviews['average']) if reviews['average'] is not None else 0
-
-    def count_review(self):
-        reviews = Reviews.objects.filter(blog=self, status=True).aggregate(count=Count('id'))
-        return int(reviews['count']) if reviews['count'] is not None else 0
+        return f"{self.user} review on {self.content_object}"
