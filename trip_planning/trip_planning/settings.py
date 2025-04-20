@@ -98,8 +98,12 @@ WSGI_APPLICATION = 'trip_planning.wsgi.application'
 
 DATABASES = {
     'default': {
-        'ENGINE': 'django.db.backends.sqlite3',
-        'NAME': BASE_DIR / 'db.sqlite3',
+        'ENGINE': 'django.db.backends.mysql',
+        'NAME': 'aliqwer$db',
+        'USER': 'aliqwer',
+        'PASSWORD': 'F21bdocs1e02112',
+        'HOST': 'aliqwer.mysql.pythonanywhere-services.com',
+        'PORT': '3306',
     }
 }
 
