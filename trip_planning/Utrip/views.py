@@ -68,7 +68,6 @@ def logout_view(request):
 
 def destination_list(request, destination_spot=None):
     destinations = Destination.objects.all()  # Start with all destinations
-    print("Initial Destinations Count:", destinations.count())
 
     keyword = request.GET.get('keyword', '')
     category = request.GET.get('category', '')
@@ -105,40 +104,36 @@ def destination_list(request, destination_spot=None):
 
 @login_required
 def destination_details(request, destination_name):
-    # Retrieve the destination object based on destination_name
+    # Get destination object
     dest = get_object_or_404(Destination, destination_spot=destination_name)
 
-    # Fetch accommodations related to the city from the destination
-    accommodations = Accommodation.objects.filter(destination=dest.city)  # Use the related city
+    # Accommodations in the destination's city
+    accommodations = Accommodation.objects.filter(destination=dest.city)
 
-    # Retrieve reviews related to this destination
-    reviews = Review.objects.filter(destination=dest)
+    # Correct way to fetch reviews for this destination
+    content_type = ContentType.objects.get_for_model(Destination)
+    reviews = Review.objects.filter(content_type=content_type, object_id=dest.id)
 
-    # Initialize the review form
+    # Review form
     form = ReviewForm()
 
-    # Calculate number of slides for displaying reviews
+    # Number of slides (e.g., for carousel)
     n = len(reviews)
     nSlides = ceil(n / 4)
 
     context = {
-    'accommodations': accommodations,
-    'destination': dest,
-    'reviews': reviews,
-    'no_of_slides': nSlides,
-    'range': range(1, nSlides + 1),
-    'form': form
-}
+        'accommodations': accommodations,
+        'destination': dest,
+        'reviews': reviews,
+        'no_of_slides': nSlides,
+        'range': range(1, nSlides + 1),
+        'form': form,
+    }
 
     return render(request, 'destination_details.html', context)
 
-from django.contrib.contenttypes.models import ContentType
 
-from django.shortcuts import get_object_or_404, redirect
 from django.contrib.contenttypes.models import ContentType
-from .forms import ReviewForm
-from .models import Review
-from django.contrib import messages
 
 def submit_review(request, model_name, object_id):
     url = request.META.get('HTTP_REFERER')
@@ -526,7 +521,7 @@ def blog(request):
 
 def blog_detail(request, id):
     blog = get_object_or_404(Blog, id=id)
-    
+
     # Use ContentType to filter generic relation
     content_type = ContentType.objects.get_for_model(Blog)
     reviews = Review.objects.filter(content_type=content_type, object_id=blog.id)
@@ -543,4 +538,4 @@ def blog_detail(request, id):
             'form': ReviewForm(),
             'slide_range': range(num_of_slides) if num_of_slides > 0 else range(1)
     }
-    return render(request, 'blog_detail.html',context) 
+    return render(request, 'blog_detail.html',context)

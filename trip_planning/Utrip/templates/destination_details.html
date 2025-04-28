@@ -4,12 +4,23 @@
 {% block content %}
 
 <style>
-    .star-rating {
-    display: inline-block;
-    font-size: 0;
-    unicode-bidi: bidi-override;
-    direction: rtl;
+/* Fancy and Large Image Style */
+.fancy-img {
+    width: 70%;
+    max-width: 600px; /* You can adjust this */
+    height: auto;
+    display: block;
+    margin: 30px auto; /* Center and add spacing */
+    border-radius: 20px;
+    box-shadow: 0 12px 30px rgba(0, 0, 0, 0.3);
+    transition: transform 0.4s ease, box-shadow 0.4s ease;
 }
+
+.fancy-img:hover {
+    transform: scale(1.03);
+    box-shadow: 0 20px 40px rgba(0, 0, 0, 0.4);
+}
+
 .star-rating input {
     display: none;
 }
@@ -72,6 +83,24 @@
         </div>
     </div>
 </div>
+
+
+
+<div class="destination_details_info py-5 bg-light">
+    <div class="container">
+        <div class="row justify-content-center">
+            <div class="col-lg-8 col-md-9">
+                <div class="destination_info">
+                    <h3 class="mb-4 font-weight-bold">View</h3>
+<img src="{{ destination.img1.url }}" class="fancy-img" alt="Scenery Image">
+
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+
 <!-- Destination Details with Modern Layout -->
 <div class="destination_details_info py-5 bg-light">
     <div class="container">
@@ -85,7 +114,19 @@
         </div>
     </div>
 </div>
+<div class="destination_details_info py-5 bg-light">
+    <div class="container">
+        <div class="row justify-content-center">
+            <div class="col-lg-8 col-md-9">
+                <div class="destination_info">
+                    <h3 class="mb-4 font-weight-bold">View</h3>
+<img src="{{ destination.img2.url }}" class="fancy-img" alt="Scenery Image">
 
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
 <!-- Fancy Hotel Listings with Cards -->
 <div class="accommodation py-5">
     <div class="container">
@@ -162,7 +203,7 @@
 <!-- Review Form -->
 <form method="post" id="review-form">
     {% csrf_token %}
-    
+
     <!-- Star Rating UI -->
     <div class="star-rating">
         {% for i in "54321" %}

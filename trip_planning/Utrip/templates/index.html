@@ -18,7 +18,7 @@
 	  z-index: 1000;
 	  font-size: 24px;
 	}
-  
+
 	/* Chat Interface */
 	#chat-interface-container {
 	  position: fixed;
@@ -32,11 +32,11 @@
 	  align-items: center;
 	  z-index: 9999;
 	}
-  
+
 	#chat-interface-container.hidden {
 	  display: none;
 	}
-  
+
 	.chat-interface-header {
 	  background-color: #007bff;
 	  color: white;
@@ -48,7 +48,7 @@
 	  border-top-left-radius: 8px;
 	  border-top-right-radius: 8px;
 	}
-  
+
 	.chat-interface-content {
 	  background: white;
 	  width: 90%;
@@ -59,7 +59,7 @@
 	  display: flex;
 	  flex-direction: column;
 	}
-  
+
 	.chat-interface-content iframe {
 	  flex-grow: 1;
 	  width: 100%;
@@ -68,24 +68,24 @@
   </style>
 <section class="hero-wrap hero-wrap-2" style="background-image: url({% static 'images/bg_1.jpeg' %})" ; data-stellar-background-ratio="0.5">
 	<div class="overlay"></div>
-	
+
 <div class="container">
-		
+
         <div class="row no-gutters slider-text align-items-center">
           <div class="col-lg-7 col-md-6 ftco-animate d-flex align-items-end">
           	<div class="text" style="margin-top: 60px;">
 	            <h1 class="mb-4">Find Perfect <br>Destination Of Your Choice.</h1>
 	            <p style="font-size: 18px;">From deserts to rivers, rivers to forests, and forests to mountains – let every journey tell a story</p>
 	            <p><a href="{% url 'destination_list' destination_spot='some-spot' %}" class="btn btn-primary py-3 px-4">View all Destinations</a></p>
-				
+
             </div>
           </div>
         </div>
       </div>
 
-		
+
 	  </section>
-	  
+
     <section class="ftco-section ftco-no-pb ftco-no-pt bg-primary">
       <div class="container">
         <div class="row d-flex no-gutters">
@@ -96,7 +96,7 @@
                 <h3>Trusted by Thousands</h3>
                 <p>A small river named Duden flows by their place and supplies it with the necessary regelialia.</p>
               </div>
-            </div>      
+            </div>
           </div>
           <div class="col-md-3 d-flex align-items-stretch ftco-animate">
             <div class="media block-6 services services-bg services-darken d-block text-center px-4 py-5">
@@ -105,7 +105,7 @@
                 <h3>Wide Range of Destinations</h3>
                 <p>The world is a book, and those who do not travel read only one page.</p>
               </div>
-            </div>      
+            </div>
           </div>
           <div class="col-md-3 d-flex align-items-stretch ftco-animate">
             <div class="media block-6 services services-bg services-lighten d-block text-center px-4 py-5">
@@ -114,7 +114,7 @@
                 <h3>Traveling Made Easy</h3>
                 <p>Travel far enough, you meet yourself.</p>
               </div>
-            </div>      
+            </div>
           </div>
           <div class="col-md-3 d-flex align-items-stretch ftco-animate">
             <div class="media block-6 services services-bg d-block text-center px-4 py-5">
@@ -123,7 +123,7 @@
                 <h3>Locked in Scenery</h3>
                 <p>Take only memories, leave only footprints.</p>
               </div>
-            </div>      
+            </div>
           </div>
         </div>
       </div>
@@ -137,34 +137,28 @@
 			  <h2 class="mb-2">Featured Destinations</h2>
 			</div>
 		  </div>
-		  <div class="row">
-			<div class="container my-4  col-md-4 d-block">
-			
-						
-							  {% for destination in dests %}
-							  <a href="{% url 'destination_details' destination.destination_spot %}" >
-								  <div class="border" style="background-image: url('{{ destination.featured_img.url }}'); background-size: cover; background-position: center;">
-									  <div class="desc">
-										  <strong class="d-inline-block mb-2 text-primary">CITY: {{ destination.city }}</strong>
-										  <h4 class="mb-0">{{ destination.destination_spot }}</h4>
-										  <p class="mt-2">Type: {{ destination.category }}</p>
-										  <div class="mt-auto">
-											  <span class="btn btn-primary btn-sm">Explore more</span>
-										  </div>
-									  </div>
-								  </div>
-							  </a>
-							  {% endfor %}
-						  </div>
-					  </div>
-					 
-		
-		
-		  
+		   <div class="container">
+        <div class="row">
+            {% for destination in destinations %}
+                <div class="col-md-4 mb-4">
+                    <div class="destination-box border p-3" style="background-image: url('{{ destination.img1.url }}'); background-size: cover; background-position: center;">
+                        <h3>{{ destination.destination_spot }}</h3>
+                        <p>City: {{ destination.city.name }}</p>
+                        <p>Category: {{ destination.category.category_name }}</p>
+                        <a href="{% url 'destination_details' destination.destination_spot %}" class="btn btn-primary">Explore More</a>
+                    </div>
+                </div>
+            {% endfor %}
+        </div>
+
+
+
+
+
 		</div>
 	  </section>
-	  
-             
+
+
 
 
     <section class="ftco-section ftco-no-pb ftco-no-pt">
@@ -207,7 +201,7 @@
               </div>
             </div>
           </div>
-         
+
           <div class="col-md-6 col-lg-3 justify-content-center counter-wrap ftco-animate">
             <div class="block-18 py-5 mb-4">
               <div class="text d-flex align-items-center">
@@ -377,14 +371,14 @@
 		<button onclick="toggleChatInterface()">✖</button>
 	  </div>
 	  <div class="chat-interface-content">
-		<iframe 
+		<iframe
 		  src="https://cdn.botpress.cloud/webchat/v2.2/shareable.html?configUrl=https://files.bpcontent.cloud/2025/01/24/13/20250124134851-V8FVY11P.json"
 		  frameborder="0"></iframe>
 	  </div>
 	</div>
-	
-	
-	
+
+
+
 	<script>
 	  // Toggle the visibility of the chat interface
 	  function toggleChatInterface() {
@@ -393,7 +387,7 @@
 	  }
 	</script>
 
-  
+
 <link rel="icon" href="{% static 'scss/favicon.ico' %}" type="image/x-icon">
 <script src="{% static 'js/jquery.min.js' %}"></script>
 <script src="{% static 'js/jquery-migrate-3.0.1.min.js' %}"></script>
