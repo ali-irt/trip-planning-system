@@ -35,18 +35,21 @@ def register_view(request):
     if request.method == 'POST':
         form = RegisterForm(request.POST)
         if form.is_valid():
-            user = form.save(commit=False)
-            user.set_password(form.cleaned_data['password'])  # Hash the password
-            user.is_active = False
-            user.save()
-            send_otp(user)
+            # Temporarily store user data in session
+            request.session['user_data'] = {
+                'username': form.cleaned_data['username'],
+                'email': form.cleaned_data['email'],
+                'password': form.cleaned_data['password']
+            }
+            # Create a temporary user object (not saved to DB yet)
+            temp_user = User(username=form.cleaned_data['username'], email=form.cleaned_data['email'])
+            send_otp(temp_user)  # Send OTP using unsaved user object
             messages.success(request, 'Account created! OTP sent to your email.')
-            return redirect('verify_otp', user_id=user.id)
+            return redirect('verify_otp')
     else:
         form = RegisterForm()
 
     return render(request, 'register.html', {'form': form})
-
 
 def login_view(request):
     if request.method == "POST":
@@ -241,15 +244,14 @@ def search(request):
     return render(request, 'search_results.html', {'results': results, 'query': query})
 
 def send_otp(user):
-    otp, created = OTP.objects.get_or_create(user=user)
+    # Get or create OTP based on email (since user not saved yet)
+    otp, created = OTP.objects.get_or_create(email=user.email)
     otp.generate_otp()
 
-    # Send email
     subject = 'Your OTP for Email Verification'
     message = f'Your OTP is {otp.otp}. It is valid for 5 minutes.'
     email_from = 'travellmaatte@gmail.com'
     recipient_list = [user.email]
-
     send_mail(subject, message, email_from, recipient_list)
 
 
@@ -268,23 +270,31 @@ def email_verification_view(request):
     return render(request, 'email_verification.html')
 
 
-def verify_otp_view(request, user_id):
-    user = get_object_or_404(User, id=user_id)
-    otp_instance = OTP.objects.filter(user=user).first()
+def verify_otp_view(request):
+    user_data = request.session.get('user_data')
+    if not user_data:
+        messages.error(request, "Session expired or invalid access.")
+        return redirect('register')
+
+    temp_user = User(username=user_data['username'], email=user_data['email'])
+
+    otp_instance = OTP.objects.filter(user__email=temp_user.email).first()
 
     if request.method == 'POST':
         otp = request.POST.get('otp')
-
         if otp_instance and otp_instance.otp == otp:
-            # Ensure that created_at is timezone-aware
             created_at = timezone.make_aware(otp_instance.created_at) if otp_instance.created_at.tzinfo is None else otp_instance.created_at
-            time_diff = timezone.now() - created_at
-
-            # Check if OTP is still valid (e.g., within 5 minutes)
-            if time_diff <= timedelta(minutes=5):
-                user.is_active = True  # Activate user upon OTP verification
+            if timezone.now() - created_at <= timedelta(minutes=5):
+                # Now create the user
+                user = User.objects.create_user(
+                    username=user_data['username'],
+                    email=user_data['email'],
+                    password=user_data['password']
+                )
+                user.is_active = True
                 user.save()
-                otp_instance.delete()  # OTP is used, so remove it
+                otp_instance.delete()
+                request.session.pop('user_data', None)  # Clean up session
                 messages.success(request, 'Your email has been verified and your account is activated.')
                 return redirect('login')
             else:
@@ -292,7 +302,8 @@ def verify_otp_view(request, user_id):
         else:
             messages.error(request, 'Invalid OTP.')
 
-    return render(request, 'verify_otp.html', {'user': user})
+    return render(request, 'verify_otp.html', {'user': temp_user})
+
 
 @login_required
 def profile_user(request):
