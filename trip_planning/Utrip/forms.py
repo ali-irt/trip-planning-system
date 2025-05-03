@@ -33,7 +33,7 @@ class RegisterForm(forms.ModelForm):
 
         if password != confirm_password:
             raise ValidationError("Passwords do not match.")
-
+        return cleaned_data
 
 class EditUserForm(forms.ModelForm):
     class Meta:
