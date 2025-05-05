@@ -279,7 +279,7 @@ def verify_otp_view(request):
 
     temp_user = User(username=user_data['username'], email=user_data['email'])
 
-    otp_instance = OTP.objects.filter(user__email=temp_user.email).first()
+    otp_instance = OTP.objects.filter(email=temp_user.email).first()
 
     if request.method == 'POST':
         otp = request.POST.get('otp')

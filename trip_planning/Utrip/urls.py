@@ -15,7 +15,7 @@ urlpatterns = [
     path('logout/', logout_view, name='logout'),
     path('register/', register_view, name='register'),
     path('email-verification/', email_verification_view, name='email_verification'),
-    path('verify-otp/<int:user_id>/', verify_otp_view, name='verify_otp'),
+    path('verify-otp/', verify_otp_view, name='verify_otp'),
 
   # If destination_spot is provided, it will be captured
     path('destination_list/<str:destination_spot>/', destination_list, name='destination_list'),

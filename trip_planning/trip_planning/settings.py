@@ -18,7 +18,7 @@ SECRET_KEY = 'django-insecure-*!3qfub#tpbpamgmu3a2@_i*d#5cj+t8#x89gcnp(rjls%g!=x
 
 DEBUG = False
 
-ALLOWED_HOSTS = ['aliqwer.pythonanywhere.com','*']
+ALLOWED_HOSTS = ['aliqwer.pythonanywhere.com']
 
 INSTALLED_APPS = [
     'django.contrib.admin',
@@ -97,14 +97,14 @@ TEMPLATES = [
 WSGI_APPLICATION = 'trip_planning.wsgi.application'
 
 DATABASES = {
-    'default': {
-        'ENGINE': 'django.db.backends.mysql',
+   'default': {
+      'ENGINE': 'django.db.backends.mysql',
         'NAME': 'aliqwer$db',
         'USER': 'aliqwer',
         'PASSWORD': 'F21bdocs1e02112',
-        'HOST': 'aliqwer.mysql.pythonanywhere-services.com',
-        'PORT': '3306',
-    }
+       'HOST': 'aliqwer.mysql.pythonanywhere-services.com',
+       'PORT': '3306',
+  }
 }
 
 AUTH_PASSWORD_VALIDATORS = [
@@ -147,9 +147,9 @@ DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 EMAIL_HOST = 'smtp.gmail.com'
 EMAIL_PORT = 587
 EMAIL_USE_TLS = True
-EMAIL_HOST_USER = 'aliirtazakhalid12@gmail.com'
+EMAIL_HOST_USER = 'ali233khalid@gmail.com'
 EMAIL_HOST_PASSWORD = 'fgpu zxsi ludu ijzb'
-DEFAULT_FROM_EMAIL = 'aliirtazakhalid12@gmail.com'
+DEFAULT_FROM_EMAIL = 'ali233khalid@gmail.com'
 EMAIL_TIMEOUT = 160  # 60 seconds
 EMAIL_USE_LOCALTIME = False
 EMAIL_SSL_CERTFILE = None
