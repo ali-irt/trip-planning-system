@@ -26,7 +26,7 @@ class City(models.Model):
         ('Azad Jammu & Kashmir', 'Azad Jammu & Kashmir'),
         ('Gilgit-Baltistan', 'Gilgit-Baltistan'),
     ]
-    
+
     name = models.CharField(max_length=50)
     province = models.CharField(max_length=30, choices=PAKISTAN_PROVINCES)
     def __str__(self):
@@ -58,16 +58,14 @@ class Faq(models.Model):
 
 
 class OTP(models.Model):
-    user = models.OneToOneField(User, on_delete=models.CASCADE)
+    email = models.EmailField()
     otp = models.CharField(max_length=6)
     created_at = models.DateTimeField(auto_now_add=True)
 
     def generate_otp(self):
+        import random
         self.otp = str(random.randint(100000, 999999))
         self.save()
-
-    def __str__(self):
-        return f"{self.user.username} - {self.otp}"
 
 class Profile(models.Model):
     user = models.OneToOneField(User, on_delete=models.CASCADE, related_name='profile')
@@ -79,7 +77,7 @@ class Profile(models.Model):
 
     def __str__(self):
         return self.user.username
-    
+
 
 
 @receiver(post_save, sender=User)

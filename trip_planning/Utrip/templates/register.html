@@ -1,9 +1,9 @@
 {% extends 'base.html' %}
 {% load static %}
+{% load socialaccount %}
 {% block content %}
-
 <head>
-   
+
     <title>Sign Up - WanderWise</title>
 
     <!-- Internal CSS -->
@@ -35,8 +35,8 @@
             padding: 20px;
         }
 
-       
-     
+
+
         .title {
             font-size: 24px;
             font-weight: bold;
@@ -121,15 +121,15 @@
 <section class="hero-wrap" style="background-image: url('{% static "images/place-1.jpg" %}');">
     <div class="overlay"></div>
     <div class="wrapper">
-        <div class="title">Create Your Travelmate Account</div>
+        <div class="title">Create Your WanderWise Account</div>
         <form method="POST" action="{% url 'register' %}">
             {% csrf_token %}
             {{ form.as_p }}
         <button type="submit" class="btn">Register</button>
         </form>
         <a href="{% provider_login_url 'google' %}" class="btn btn-outline-danger d-flex align-items-center justify-content-center" style="gap: 10px;">
-            <img src="https://upload.wikimedia.org/wikipedia/commons/thumb/5/53/Google_%22G%22_Logo.svg/512px-Google_%22G%22_Logo.svg.png" 
-                 alt="Google Logo" 
+            <img src="https://upload.wikimedia.org/wikipedia/commons/thumb/5/53/Google_%22G%22_Logo.svg/512px-Google_%22G%22_Logo.svg.png"
+                 alt="Google Logo"
                  style="width: 20px; height: 20px;">
             Login with Google
         </a>

@@ -137,9 +137,10 @@
 			  <h2 class="mb-2">Featured Destinations</h2>
 			</div>
 		  </div>
-		   <div class="container">
+		     <!-- Destinations List -->
+    <div class="container">
         <div class="row">
-            {% for destination in destinations %}
+            {% for destination in dests %}
                 <div class="col-md-4 mb-4">
                     <div class="destination-box border p-3" style="background-image: url('{{ destination.img1.url }}'); background-size: cover; background-position: center;">
                         <h3>{{ destination.destination_spot }}</h3>
@@ -151,7 +152,8 @@
             {% endfor %}
         </div>
 
-
+    </div>
+</div>
 
 
 

@@ -147,14 +147,14 @@ DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 EMAIL_HOST = 'smtp.gmail.com'
 EMAIL_PORT = 587
 EMAIL_USE_TLS = True
-EMAIL_HOST_USER = 'travellmaatte@gmail.com'
-EMAIL_HOST_PASSWORD = 'tjotqopycknhefsb'
-DEFAULT_FROM_EMAIL = 'travellmaatte@gmail.com'
+EMAIL_HOST_USER = 'aliirtazakhalid12@gmail.com'
+EMAIL_HOST_PASSWORD = 'fgpu zxsi ludu ijzb'
+DEFAULT_FROM_EMAIL = 'aliirtazakhalid12@gmail.com'
 EMAIL_TIMEOUT = 160  # 60 seconds
 EMAIL_USE_LOCALTIME = False
 EMAIL_SSL_CERTFILE = None
 EMAIL_SSL_KEYFILE = None
-SERVER_EMAIL ='travellmaatte@gmail.com'
+SERVER_EMAIL =EMAIL_HOST_USER
 
 AUTHENTICATION_BACKENDS = [
     'allauth.account.auth_backends.AuthenticationBackend',

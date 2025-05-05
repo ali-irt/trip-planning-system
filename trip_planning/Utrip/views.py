@@ -30,7 +30,7 @@ def home(request):
 def about(request):
     return render(request, 'about.html')
 
-
+@csrf_exempt
 def register_view(request):
     if request.method == 'POST':
         form = RegisterForm(request.POST)
@@ -244,7 +244,7 @@ def search(request):
     return render(request, 'search_results.html', {'results': results, 'query': query})
 
 def send_otp(user):
-    # Get or create OTP based on email (since user not saved yet)
+    # Use email instead of user FK
     otp, created = OTP.objects.get_or_create(email=user.email)
     otp.generate_otp()
 
@@ -253,6 +253,7 @@ def send_otp(user):
     email_from = 'travellmaatte@gmail.com'
     recipient_list = [user.email]
     send_mail(subject, message, email_from, recipient_list)
+
 
 
 def email_verification_view(request):
